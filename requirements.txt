@@ -1,9 +1,7 @@
 streamlit>=1.28.0
 openai>=1.0.0
-openai-whisper>=20231117
 pandas>=2.0.0
 plotly>=5.15.0
 python-docx>=0.8.11
 reportlab>=4.0.0
-python-dotenv>=1.0.0# Fixed for Streamlit Cloud
-
+python-dotenv>=1.0.0
