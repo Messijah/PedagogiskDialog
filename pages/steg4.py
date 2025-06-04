@@ -39,8 +39,6 @@ if not current_session:
 st.title("Steg 4: Handlingsplan")
 st.markdown(f"Session: {current_session['session_name']} | Rektor: {current_session['rektor_name']}")
 
-from utils.audio_text_input import audio_text_input
-
 # === NYTT: Gemensam komponent för ljud/text ===
 transcript, audio_path = audio_text_input(4, current_session['id'], key_prefix="steg4")
 if transcript:

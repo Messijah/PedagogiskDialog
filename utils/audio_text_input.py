@@ -1,93 +1,92 @@
 import streamlit as st
 from utils.audio_handler import (
-    transcribe_uploaded_file,
+    transcribe_audio_openai,
     validate_audio_file,
     record_audio_streamlit,
+    save_uploaded_audio,
     save_recorded_audio,
-    transcribe_audio_openai
+    display_audio_player
 )
 
-def audio_text_input(steg_nummer, session_id, key_prefix=""):
+def audio_text_input(step_number, session_id, key_prefix=""):
     """
-    Återanvändbar komponent för ljuduppladdning, inspelning och inklistring av transkribering.
-    Returnerar (transkribering, audio_path) eller (transkribering, None)
+    Komponent för att låta användaren:
+     1. Ladda upp ljudfil
+     2. Spela in direkt i webbläsaren
+     3. Klistra in transkribering manuellt
+
+    Returnerar (transkribering, audio_path) eller (None, None) om inget val gjorts.
     """
     transcript = None
     audio_path = None
+
     st.markdown("---")
-    st.subheader("Ladda upp eller klistra in samtal")
+    st.subheader("Ljudalternativ")
 
-    tab1, tab2, tab3 = st.tabs([
-        "Ladda upp ljudfil", 
-        "Spela in direkt", 
-        "Klistra in transkribering"
-    ])
+    # 1) Uppladdning av befintlig ljudfil
+    uploaded_file = st.file_uploader(
+        label="1. Ladda upp ljudfil (wav/mp3)",
+        type=["wav", "mp3"],
+        key=f"{key_prefix}_uploader_{step_number}"
+    )
+    if uploaded_file:
+        ok, msg = validate_audio_file(uploaded_file)
+        if not ok:
+            st.error(msg)
+        else:
+            audio_path = save_uploaded_audio(uploaded_file, session_id, step_number)
+            st.success(f"Ljudfil uppladdad: `{audio_path}`")
+            display_audio_player(audio_path)
 
-    with tab1:
-        st.markdown("**Ladda upp en ljudfil från samtalet:**")
-        uploaded_file = st.file_uploader(
-            "Välj ljudfil",
-            type=['wav', 'mp3', 'm4a', 'mp4'],
-            key=f"{key_prefix}_audio_upload_{steg_nummer}"
-        )
-        if uploaded_file:
-            is_valid, message = validate_audio_file(uploaded_file)
-            if is_valid:
-                st.success(f"✅ Fil uppladdad: {uploaded_file.name}")
-                st.audio(uploaded_file.getvalue())
-                if st.button("🔤 Transkribera ljudfil", key=f"{key_prefix}_transcribe_audio_{steg_nummer}"):
-                    with st.spinner("Transkriberar ljudfil... Detta kan ta några minuter."):
-                        try:
-                            transcript, audio_path = transcribe_uploaded_file(
-                                uploaded_file, session_id, steg_nummer
-                            )
-                            if transcript:
-                                st.success("✅ Transkribering klar!")
-                                return transcript, audio_path
-                            else:
-                                st.error("Kunde inte transkribera filen. Kontrollera att det är en giltig ljudfil.")
-                        except Exception as e:
-                            st.error(f"Fel vid transkribering: {str(e)}")
-            else:
-                st.error(f"❌ {message}")
+            if st.button("🔊 Transkribera uppladdad fil", key=f"{key_prefix}_trans_up_{step_number}"):
+                with st.spinner("Transkriberar..."):
+                    transcript = transcribe_audio_openai(audio_path)
+                if transcript:
+                    st.text_area(
+                        "Transkribering:",
+                        value=transcript,
+                        height=200,
+                        key=f"{key_prefix}_auto_trans_{step_number}"
+                    )
+                    return transcript, audio_path
 
-    with tab2:
-        st.markdown("**Spela in direkt i webbläsaren:**")
-        try:
-            audio_bytes = record_audio_streamlit()
-            if audio_bytes:
-                st.success("✅ Inspelning mottagen!")
-                if st.button("🔤 Transkribera inspelning", key=f"{key_prefix}_transcribe_recording_{steg_nummer}"):
-                    with st.spinner("Sparar och transkriberar inspelning..."):
-                        try:
-                            audio_path = save_recorded_audio(audio_bytes, session_id, steg_nummer)
-                            transcript = transcribe_audio_openai(audio_path)
-                            if transcript:
-                                st.success("✅ Transkribering klar!")
-                                return transcript, audio_path
-                            else:
-                                st.error("Kunde inte transkribera inspelningen.")
-                        except Exception as e:
-                            st.error(f"Fel vid transkribering: {str(e)}")
-        except:
-            st.warning("Direktinspelning inte tillgänglig. Använd filuppladdning istället.")
+    st.markdown("— eller —")
 
-    with tab3:
-        st.markdown("**Klistra in transkribering manuellt:**")
-        manual_transcript = st.text_area(
-            "Klistra in transkriberingen från samtalet här:",
-            value=st.session_state.get(f"{key_prefix}_manual_transcript_{steg_nummer}", ''),
-            height=300,
-            key=f"{key_prefix}_manual_transcript_{steg_nummer}"
-        )
-        if st.button("💾 Spara transkribering", key=f"{key_prefix}_save_manual_transcript_{steg_nummer}"):
-            if steg_nummer == 2:
-                st.session_state.transcript_steg2 = manual_transcript
-            elif steg_nummer == 3:
-                st.session_state.transcript_steg3 = manual_transcript
-            elif steg_nummer == 4:
-                st.session_state.transcript_steg4 = manual_transcript
-            st.success("Transkribering sparad!")
-            return manual_transcript, None
+    # 2) Liveinspelning via webbläsaren
+    st.markdown("2. Spela in ljud direkt:")
+    audio_bytes = record_audio_streamlit(session_id, step_number, key_prefix=key_prefix)
+    if audio_bytes:
+        saved_path = save_recorded_audio(audio_bytes, session_id, step_number)
+        if saved_path:
+            st.success(f"Inspelad ljudfil sparad: `{saved_path}`")
+            display_audio_player(saved_path)
+            audio_path = saved_path
+
+            if st.button("🔊 Transkribera inspelning", key=f"{key_prefix}_trans_rec_{step_number}"):
+                with st.spinner("Transkriberar inspelning..."):
+                    transcript = transcribe_audio_openai(audio_path)
+                if transcript:
+                    st.text_area(
+                        "Transkribering:",
+                        value=transcript,
+                        height=200,
+                        key=f"{key_prefix}_auto_trans_rec_{step_number}"
+                    )
+                    return transcript, audio_path
+
+    st.markdown("— eller —")
+
+    # 3) Manuell inklistring av transkribering
+    st.markdown("3. Klistra in transkribering manuellt:")
+    manual_transcript = st.text_area(
+        label="Klistra in transkribering eller skriv här:",
+        value=st.session_state.get(f"{key_prefix}_manual_transcript_{step_number}", ""),
+        height=200,
+        key=f"{key_prefix}_manual_transcript_{step_number}"
+    )
+    if st.button("💾 Spara manuell transkribering", key=f"{key_prefix}_save_manual_{step_number}"):
+        st.session_state[f"transcript_steg{step_number}"] = manual_transcript
+        st.success("Manuell transkribering sparad!")
+        return manual_transcript, None
 
     return None, None 
