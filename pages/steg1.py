@@ -115,7 +115,7 @@ if current_session['steg1_approved']:
     if not st.session_state.get('edit_steg1', False):
         st.stop()
 
-# Formulär för problembeskrivning
+# Formulär för problembeskrivning och uppladdning
 st.subheader("Beskriv problemet eller frågan")
 st.markdown("""
 Börja med att tydligt beskriva det problem eller den fråga som du vill diskutera med din personalgrupp. 
@@ -123,6 +123,59 @@ AI:n kommer sedan att hjälpa dig att strukturera hur du bäst presenterar detta
 """)
 
 with st.form("problem_form"):
+    # --- Uppladdning av transkribering (ljud eller text) ---
+    st.markdown("---")
+    st.subheader("📤 Ladda upp transkribering (valfritt)")
+    col1, col2 = st.columns(2)
+    with col1:
+        uploaded_audio = st.file_uploader(
+            "Ladda upp ljudfil för transkribering (WAV/MP3/M4A/MP4)",
+            type=["wav", "mp3", "m4a", "mp4"],
+            key="audio_upload_steg1"
+        )
+        if uploaded_audio:
+            from utils.audio_handler import transcribe_uploaded_file, validate_audio_file
+            is_valid, message = validate_audio_file(uploaded_audio)
+            if is_valid:
+                st.success(f"✅ Fil uppladdad: {uploaded_audio.name}")
+                if st.form_submit_button("🔤 Transkribera ljudfil", key="transcribe_audio_steg1"):
+                    with st.spinner("Transkriberar ljudfil... Detta kan ta några minuter."):
+                        transcript, audio_path = transcribe_uploaded_file(
+                            uploaded_audio, current_session['id'], 1
+                        )
+                        if transcript:
+                            st.session_state.transcript_steg1 = transcript
+                            st.success("✅ Transkribering klar!")
+                            st.experimental_rerun()
+                        else:
+                            st.error("Kunde inte transkribera filen. Kontrollera att det är en giltig ljudfil.")
+            else:
+                st.error(f"❌ {message}")
+    with col2:
+        uploaded_text = st.file_uploader(
+            "Ladda upp färdig transkribering (TXT)",
+            type=["txt"],
+            key="text_upload_steg1"
+        )
+        if uploaded_text:
+            transcript_text = uploaded_text.read().decode("utf-8")
+            st.session_state.transcript_steg1 = transcript_text
+            st.success("✅ Texttranskribering uppladdad!")
+            st.experimental_rerun()
+    # Visa transkribering om den finns
+    transcript = st.session_state.get('transcript_steg1', '')
+    if transcript:
+        st.markdown("---")
+        st.subheader("📝 Transkribering (Steg 1)")
+        edited_transcript = st.text_area(
+            "Granska och redigera transkriberingen om nödvändigt:",
+            value=transcript,
+            height=300,
+            help="Du kan redigera transkriberingen för att korrigera eventuella fel"
+        )
+        if edited_transcript != transcript:
+            st.session_state.transcript_steg1 = edited_transcript
+            transcript = edited_transcript
     # Problem beskrivning
     problem_beskrivning = st.text_area(
         "Problembeskrivning *",
@@ -131,7 +184,6 @@ with st.form("problem_form"):
         help="Beskriv tydligt det problem eller den fråga som ska diskuteras",
         placeholder="Exempel: Vi behöver diskutera hur vi kan förbättra elevernas digitala kompetens..."
     )
-    
     # Personalgrupp
     personal_grupp = st.selectbox(
         "Vilken personalgrupp ska delta? *",
@@ -139,7 +191,6 @@ with st.form("problem_form"):
         index=0 if not current_session.get('personal_grupp') else 
               ["Lärare", "EHT-personal", "Blandad grupp (lärare + EHT)", "Ledningsgrupp", "Hela personalstyrkan", "Annat"].index(current_session.get('personal_grupp', 'Lärare'))
     )
-    
     # Ytterligare kontext
     kontext = st.text_area(
         "Ytterligare kontext (valfritt)",
@@ -148,13 +199,11 @@ with st.form("problem_form"):
         help="Lägg till relevant bakgrundsinformation som kan hjälpa AI:n att ge bättre förslag",
         placeholder="Exempel: Detta är en uppföljning av tidigare diskussioner om... Vi har tidigare provat... Utmaningen är att..."
     )
-    
     # Submit knapp
     submit_button = st.form_submit_button("🤖 Få AI-förslag", type="primary")
 
 # Hantera formulärinlämning
 if submit_button:
-    # Om problembeskrivning är tom, men transkribering finns, använd transkriberingen
     pb = problem_beskrivning.strip()
     transcript = st.session_state.get('transcript_steg1', '').strip()
     if not pb and transcript:
@@ -162,11 +211,9 @@ if submit_button:
     if not pb:
         st.error("Du måste antingen beskriva problemet eller ladda upp en transkribering innan du kan få AI-förslag.")
     else:
-        # Spara input i session state
         st.session_state.current_problem = pb
         st.session_state.current_personal_grupp = personal_grupp
         st.session_state.current_kontext = kontext
-        # Hämta AI-förslag
         with st.spinner("AI analyserar ditt problem och skapar förslag..."):
             ai_suggestion = get_ai_suggestion_steg1(pb, personal_grupp, kontext)
             if ai_suggestion:
