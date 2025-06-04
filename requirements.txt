@@ -3,7 +3,7 @@ openai>=1.0.0
 pandas>=2.0.0
 pydub>=0.25.1
 # git+https://github.com/stefanrmmr/streamlit_audio_recorder
-streamlit-audiorec @ git+https://github.com/stefanrmmr/streamlit-audiorec.git
+streamlit-audiorec @ git+https://github.com/stefanrmmr/streamlit-audio-recorder.git
 python-dotenv>=1.0.0
 
 # För direktinspelning av ljud i webbläsaren:
