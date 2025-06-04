@@ -25,19 +25,9 @@ def save_uploaded_audio(uploaded_file, session_id, step_number):
 
 @st.cache_data(show_spinner=False)
 def transcribe_audio_whisper(audio_file_path):
-    """Transkribera ljudfil med Whisper"""
-    try:
-        import whisper
-        # Ladda Whisper modell
-        model = whisper.load_model("base")
-        
-        # Transkribera
-        result = model.transcribe(audio_file_path, language="sv")
-        
-        return result["text"]
-    except Exception as e:
-        st.error(f"Fel vid transkribering: {str(e)}")
-        return None
+    """Transkribera ljudfil med Whisper (lokalt)"""
+    st.error("Lokal Whisper-transkribering stöds inte på Streamlit Cloud. Använd OpenAI Whisper API istället.")
+    return None
 
 def transcribe_audio_openai(audio_file_path):
     """Transkribera ljudfil med OpenAI Whisper API"""
@@ -59,7 +49,7 @@ def transcribe_audio_openai(audio_file_path):
 def transcribe_uploaded_file(uploaded_file, session_id, step_number, use_openai_api=True):
     """Transkribera uppladdad ljudfil"""
     if uploaded_file is None:
-        return None
+        return None, None
     
     # Spara filen temporärt
     filepath = save_uploaded_audio(uploaded_file, session_id, step_number)
