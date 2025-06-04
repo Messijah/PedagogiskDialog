@@ -7,7 +7,7 @@ from utils.audio_text_input import audio_text_input
 # Konfigurera sida
 st.set_page_config(
     page_title="Steg 1 - Problembeskrivning",
-    page_icon="🎯",
+    page_icon=None,
     layout="wide"
 )
 
@@ -24,8 +24,8 @@ if not current_session:
     st.stop()
 
 # Header
-st.title("🎯 Steg 1: Problembeskrivning och Presentation")
-st.markdown(f"**Session:** {current_session['session_name']} | **Rektor:** {current_session['rektor_name']}")
+st.title("Steg 1: Problembeskrivning")
+st.markdown(f"Session: {current_session['session_name']} | Rektor: {current_session['rektor_name']}")
 
 # === NYTT: Gemensam komponent för ljud/text ===
 transcript, audio_path = audio_text_input(1, current_session['id'], key_prefix="steg1")
@@ -165,19 +165,13 @@ if submit_button:
 # Visa AI-förslag om de finns
 if 'ai_suggestion_steg1' in st.session_state:
     st.markdown("---")
-    st.subheader("🤖 AI-förslag för presentation")
-    
-    # Visa input som användes
+    st.subheader("Förslag för presentation")
     with st.expander("Visa input som användes"):
-        st.write(f"**Problem:** {st.session_state.current_problem}")
-        st.write(f"**Personalgrupp:** {st.session_state.current_personal_grupp}")
+        st.write(f"Problem: {st.session_state.current_problem}")
+        st.write(f"Personalgrupp: {st.session_state.current_personal_grupp}")
         if st.session_state.current_kontext:
-            st.write(f"**Kontext:** {st.session_state.current_kontext}")
-    
-    # Visa AI-förslag
+            st.write(f"Kontext: {st.session_state.current_kontext}")
     st.markdown(st.session_state.ai_suggestion_steg1)
-    
-    # Kontrollknappar
     st.markdown("---")
     col1, col2, col3 = st.columns([2, 2, 1])
     
@@ -222,22 +216,18 @@ if 'ai_suggestion_steg1' in st.session_state:
 
 # Hjälptext
 st.markdown("---")
-with st.expander("💡 Tips för en bra problembeskrivning"):
+with st.expander("Tips för en bra problembeskrivning"):
     st.markdown("""
-    **En bra problembeskrivning innehåller:**
-    
-    - **Tydlig formulering** av vad som ska diskuteras
-    - **Bakgrund** till varför detta är viktigt nu
-    - **Konkreta exempel** om möjligt
-    - **Önskad utkomst** av diskussionen
-    
-    **Exempel på bra problembeskrivningar:**
-    
-    *"Vi behöver diskutera hur vi kan förbättra elevernas digitala kompetens. Många lärare känner sig osäkra på hur de ska integrera digitala verktyg i undervisningen på ett meningsfullt sätt. Vi vill komma fram till konkreta åtgärder för kompetensutveckling."*
-    
-    *"Flera föräldrar har uttryckt oro över elevernas stress och arbetsbörda. Vi behöver diskutera hur vi kan skapa en mer hållbar lärmiljö utan att sänka våra akademiska krav."*
+    En bra problembeskrivning innehåller:
+    - Tydlig formulering av vad som ska diskuteras
+    - Bakgrund till varför detta är viktigt nu
+    - Konkreta exempel om möjligt
+    - Önskad utkomst av diskussionen
+    Exempel på bra problembeskrivningar:
+    "Vi behöver diskutera hur vi kan förbättra elevernas digitala kompetens. Många lärare känner sig osäkra på hur de ska integrera digitala verktyg i undervisningen på ett meningsfullt sätt. Vi vill komma fram till konkreta åtgärder för kompetensutveckling."
+    "Flera föräldrar har uttryckt oro över elevernas stress och arbetsbörda. Vi behöver diskutera hur vi kan skapa en mer hållbar lärmiljö utan att sänka våra akademiska krav."
     """)
 
 # Footer
 st.markdown("---")
-st.caption("Steg 1 av 4 | SamtalsBot - AI-stödd samtalsmodell för rektorer")
+st.caption("Steg 1 av 4 | Samtalsmodell för rektorer")

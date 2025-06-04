@@ -9,7 +9,7 @@ from utils.audio_text_input import audio_text_input
 # Konfigurera sida
 st.set_page_config(
     page_title="Steg 3 - Fördjupad diskussion",
-    page_icon="🔍",
+    page_icon=None,
     layout="wide"
 )
 
@@ -28,8 +28,8 @@ if not current_session:
     st.stop()
 
 # Header
-st.title("🔍 Steg 3: Fördjupad diskussion")
-st.markdown(f"**Session:** {current_session['session_name']} | **Rektor:** {current_session['rektor_name']}")
+st.title("Steg 3: Fördjupad diskussion")
+st.markdown(f"Session: {current_session['session_name']} | Rektor: {current_session['rektor_name']}")
 
 # Navigation
 col1, col2, col3 = st.columns([1, 1, 3])
@@ -94,16 +94,15 @@ if current_session['steg3_approved']:
         st.stop()
 
 # Instruktioner
-st.subheader("📝 Instruktioner för Steg 3")
+st.subheader("Instruktioner för Steg 3")
 st.markdown("""
-Nu ska du genomföra en fördjupad diskussion med fokus på de perspektiv som valdes i Steg 2.
-
-**Så här gör du:**
-1. **Presentera** de valda perspektiven för gruppen
-2. **Fördjupa diskussionen** kring dessa specifika områden
-3. **Spela in samtalet** eller ladda upp en ljudfil
-4. **Låt AI analysera** och dra slutsatser från diskussionen
-5. **Godkänn slutsatserna** som grund för handlingsplanen
+Genomför en fördjupad diskussion med fokus på de perspektiv som valdes i Steg 2.
+Så här gör du:
+1. Presentera de valda perspektiven för gruppen
+2. Fördjupa diskussionen kring dessa områden
+3. Spela in samtalet eller ladda upp en ljudfil
+4. Analysera och dra slutsatser från diskussionen
+5. Godkänn slutsatserna som grund för handlingsplanen
 """)
 
 # Visa förslag på diskussionsfrågor baserat på valda perspektiv
@@ -172,13 +171,13 @@ if 'analysis_steg3' in st.session_state or current_session.get('steg3_ai_analysi
     analysis = st.session_state.get('analysis_steg3', current_session.get('steg3_ai_analysis'))
     
     st.markdown("---")
-    st.subheader("🤖 AI-analys och slutsatser")
+    st.subheader("Analys och slutsatser")
     st.markdown(analysis)
     
     # Möjlighet att redigera slutsatser
     st.markdown("---")
-    st.subheader("✏️ Granska och komplettera slutsatserna")
-    st.markdown("Du kan redigera eller komplettera AI:ns slutsatser innan du går vidare till handlingsplanen:")
+    st.subheader("Granska och komplettera slutsatserna")
+    st.markdown("Du kan redigera eller komplettera slutsatserna innan du går vidare till handlingsplanen:")
     
     final_conclusions = st.text_area(
         "Slutgiltiga slutsatser för handlingsplan:",
@@ -242,31 +241,18 @@ if 'analysis_steg3' in st.session_state or current_session.get('steg3_ai_analysi
 
 # Hjälptext
 st.markdown("---")
-with st.expander("💡 Tips för fördjupad diskussion"):
+with st.expander("Tips för fördjupad diskussion"):
     st.markdown("""
-    **För att få en produktiv fördjupad diskussion:**
-    
-    - **Fokusera** på de valda perspektiven från Steg 2
-    - **Ställ konkreta frågor** som leder mot lösningar
-    - **Uppmuntra** deltagarna att komma med förslag
-    - **Sök konsensus** där det är möjligt
-    - **Dokumentera** även kvarvarande meningsskiljaktigheter
-    
-    **Bra frågor för fördjupning:**
-    - "Vad skulle en lösning kunna se ut?"
-    - "Vilka första steg kan vi ta?"
-    - "Vad behöver vi för att komma framåt?"
-    - "Hur kan vi hantera de utmaningar som finns?"
-    - "Vem skulle kunna ansvara för detta?"
-    
-    **Sträva efter:**
-    - Konkreta åtgärdsförslag
-    - Tydliga prioriteringar
-    - Realistiska tidsramar
-    - Fördelning av ansvar
-    - Mätbara mål
+    Förslag på diskussionsfrågor:
+    - Vad är det viktigaste att komma ihåg när vi arbetar med dessa frågor?
+    - Vilka konkreta åtgärder skulle kunna hjälpa oss framåt?
+    - Vad behöver vi prioritera först?
+    - Vilka resurser eller stöd behöver vi för att lyckas?
+    - Hur kan vi mäta om vi gör framsteg?
+    - Vilka hinder måste vi överkomma?
+    - Vem bör ansvara för vad?
     """)
 
 # Footer
 st.markdown("---")
-st.caption("Steg 3 av 4 | SamtalsBot - AI-stödd samtalsmodell för rektorer")
+st.caption("Steg 3 av 4 | Samtalsmodell för rektorer")

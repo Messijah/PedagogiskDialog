@@ -16,7 +16,7 @@ from reportlab.lib.units import mm
 # Konfigurera sida
 st.set_page_config(
     page_title="Steg 4 - Handlingsplan",
-    page_icon="📋",
+    page_icon=None,
     layout="wide"
 )
 
@@ -35,8 +35,8 @@ if not current_session:
     st.stop()
 
 # Header
-st.title("📋 Steg 4: Handlingsplan")
-st.markdown(f"**Session:** {current_session['session_name']} | **Rektor:** {current_session['rektor_name']}")
+st.title("Steg 4: Handlingsplan")
+st.markdown(f"Session: {current_session['session_name']} | Rektor: {current_session['rektor_name']}")
 
 from utils.audio_text_input import audio_text_input
 
@@ -171,11 +171,10 @@ HANDLINGSPLAN:
         st.stop()
 
 # Instruktioner
-st.subheader("📝 Instruktioner för Steg 4")
+st.subheader("Instruktioner för Steg 4")
 st.markdown("""
-Nu ska vi skapa en strukturerad handlingsplan baserat på alla diskussioner och slutsatser från de tidigare stegen.
-
-**Handlingsplanen kommer att innehålla:**
+Skapa en strukturerad handlingsplan baserat på alla diskussioner och slutsatser från de tidigare stegen.
+Handlingsplanen bör innehålla:
 - Sammanfattning av problemet och slutsatserna
 - Konkreta åtgärder med ansvariga personer
 - Tidsplan och milstolpar
@@ -254,7 +253,7 @@ if 'handlingsplan_steg4' in st.session_state or current_session.get('steg4_handl
 {edited_plan}
 
 ---
-*Skapad med SamtalsBot - AI-stödd samtalsmodell för rektorer*
+*Skapad med Samtalsmodell för rektorer*
 """
         st.markdown(complete_document)
     
@@ -299,45 +298,24 @@ if 'handlingsplan_steg4' in st.session_state or current_session.get('steg4_handl
 
 # Hjälptext
 st.markdown("---")
-with st.expander("💡 Tips för en bra handlingsplan"):
+with st.expander("Tips för en bra handlingsplan"):
     st.markdown("""
-    **En effektiv handlingsplan innehåller:**
-    
-    **📋 Tydliga åtgärder**
-    - Specifika, mätbara aktiviteter
-    - Vem som ansvarar för varje åtgärd
-    - När åtgärden ska vara klar
-    
-    **⏰ Realistisk tidsplan**
-    - Prioritering av åtgärder
-    - Milstolpar och deadlines
-    - Hänsyn till andra aktiviteter
-    
-    **📊 Uppföljning**
-    - Hur framsteg ska mätas
-    - När uppföljning ska ske
-    - Vem som ansvarar för uppföljning
-    
-    **💰 Resurser**
-    - Vilka resurser som behövs
-    - Budget och finansiering
-    - Kompetensutveckling
-    
-    **🚧 Riskhantering**
-    - Potentiella hinder
-    - Alternativa lösningar
-    - Förebyggande åtgärder
-    
-    **Exempel på bra formuleringar:**
-    - "Maria ansvarar för att genomföra fortbildning i digitala verktyg senast 15 mars"
-    - "Uppföljningsmöte varje månad för att utvärdera framsteg"
-    - "Budget på 50 000 kr avsätts för inköp av material"
+    En effektiv handlingsplan innehåller:
+    - Tydliga åtgärder
+    - Realistisk tidsplan
+    - Uppföljning
+    - Resurser
+    - Riskhantering
+    Exempel på formuleringar:
+    "Maria ansvarar för att genomföra fortbildning i digitala verktyg senast 15 mars"
+    "Uppföljningsmöte varje månad för att utvärdera framsteg"
+    "Budget på 50 000 kr avsätts för inköp av material"
     """)
 
 # Slutmeddelande om processen är klar
 if current_session.get('completed'):
     st.markdown("---")
-    st.success("🎉 Grattis! Du har slutfört hela SamtalsBot-processen.")
+    st.success("🎉 Grattis! Du har slutfört hela Samtalsmodell-processen.")
     st.markdown("""
     **Du har nu:**
     - ✅ Definierat problemet tydligt
@@ -354,4 +332,4 @@ if current_session.get('completed'):
 
 # Footer
 st.markdown("---")
-st.caption("Steg 4 av 4 | SamtalsBot - AI-stödd samtalsmodell för rektorer")
+st.caption("Steg 4 av 4 | Samtalsmodell för rektorer")

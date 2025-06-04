@@ -8,7 +8,7 @@ from utils.audio_text_input import audio_text_input
 # Konfigurera sida
 st.set_page_config(
     page_title="Steg 2 - Perspektivinventering",
-    page_icon="👥",
+    page_icon=None,
     layout="wide"
 )
 
@@ -27,8 +27,8 @@ if not current_session:
     st.stop()
 
 # Header
-st.title("👥 Steg 2: Perspektivinventering")
-st.markdown(f"**Session:** {current_session['session_name']} | **Rektor:** {current_session['rektor_name']}")
+st.title("Steg 2: Perspektivinventering")
+st.markdown(f"Session: {current_session['session_name']} | Rektor: {current_session['rektor_name']}")
 
 # === NY INSTRUKTION ===
 st.info("""
@@ -83,15 +83,14 @@ if current_session['steg2_approved']:
         st.stop()
 
 # Instruktioner
-st.subheader("📝 Instruktioner för Steg 2")
+st.subheader("Instruktioner för Steg 2")
 st.markdown("""
-Nu ska du genomföra ett samtal med din personalgrupp där olika perspektiv på problemet får komma fram.
-
-**Så här gör du:**
-1. **Presentera problemet** för gruppen enligt AI-förslagen från Steg 1
-2. **Spela in samtalet** eller ladda upp en ljudfil
-3. **Låt AI analysera** de olika perspektiv som framkommer
-4. **Välj** vilka perspektiv som ska fördjupas i Steg 3
+Genomför ett samtal med din personalgrupp där olika perspektiv på problemet får komma fram.
+Så här gör du:
+1. Presentera problemet för gruppen
+2. Spela in samtalet eller ladda upp en ljudfil
+3. Analysera de olika perspektiv som framkommer
+4. Välj vilka perspektiv som ska fördjupas i Steg 3
 """)
 
 # === NYTT: Gemensam komponent för ljud/text ===
@@ -140,12 +139,12 @@ if 'analysis_steg2' in st.session_state or current_session.get('steg2_ai_analysi
     analysis = st.session_state.get('analysis_steg2', current_session.get('steg2_ai_analysis'))
     
     st.markdown("---")
-    st.subheader("🤖 AI-analys av perspektiv")
+    st.subheader("Analys av perspektiv")
     st.markdown(analysis)
     
     # Val av perspektiv för fördjupning
     st.markdown("---")
-    st.subheader("🎯 Välj perspektiv för fördjupning i Steg 3")
+    st.subheader("Välj perspektiv för fördjupning i Steg 3")
     st.markdown("Baserat på analysen ovan, vilka 2-3 perspektiv vill du fördjupa i nästa steg?")
     
     selected_perspectives = st.text_area(
@@ -210,29 +209,16 @@ if 'analysis_steg2' in st.session_state or current_session.get('steg2_ai_analysi
 
 # Hjälptext
 st.markdown("---")
-with st.expander("💡 Tips för ett bra perspektivsamtal"):
+with st.expander("Tips för ett bra perspektivsamtal"):
     st.markdown("""
-    **För att få fram olika perspektiv:**
-    
-    - **Ställ öppna frågor** som uppmuntrar reflektion
-    - **Låt alla komma till tals** - ge tid för tystlåtna deltagare
-    - **Undvik att döma** olika åsikter i detta skede
-    - **Uppmuntra konkreta exempel** från deltagarnas erfarenheter
-    - **Dokumentera** även minoritetsåsikter och avvikande perspektiv
-    
-    **Bra frågor att ställa:**
-    - "Vad är er första reaktion på detta problem?"
-    - "Vilka olika sätt finns det att se på denna fråga?"
-    - "Vad skulle ni behöva för att känna er trygga med en förändring?"
-    - "Vilka hinder ser ni? Vilka möjligheter?"
-    
-    **Tekniska tips:**
-    - Placera inspelningsenheten centralt i rummet
-    - Be deltagarna tala tydligt och en i taget
-    - Kontrollera ljudkvaliteten innan ni börjar
-    - Ha backup-plan om tekniken krånglar
+    För att få fram olika perspektiv:
+    - Ställ öppna frågor som uppmuntrar reflektion
+    - Låt alla komma till tals
+    - Undvik att döma olika åsikter
+    - Uppmuntra konkreta exempel
+    - Dokumentera även minoritetsåsikter
     """)
 
 # Footer
 st.markdown("---")
-st.caption("Steg 2 av 4 | SamtalsBot - AI-stödd samtalsmodell för rektorer")
+st.caption("Steg 2 av 4 | Samtalsmodell för rektorer")

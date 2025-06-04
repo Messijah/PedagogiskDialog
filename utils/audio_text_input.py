@@ -15,12 +15,12 @@ def audio_text_input(steg_nummer, session_id, key_prefix=""):
     transcript = None
     audio_path = None
     st.markdown("---")
-    st.subheader("🎤 Spela in, ladda upp eller klistra in samtal")
+    st.subheader("Ladda upp eller klistra in samtal")
 
     tab1, tab2, tab3 = st.tabs([
-        "📁 Ladda upp ljudfil", 
-        "🎤 Spela in direkt", 
-        "✍️ Klistra in transkribering"
+        "Ladda upp ljudfil", 
+        "Spela in direkt", 
+        "Klistra in transkribering"
     ])
 
     with tab1:

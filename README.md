@@ -1,22 +1,22 @@
-# 🗣️ SamtalsBot - AI-stödd Samtalsmodell för Rektorer
+# Samtalsmodell för rektorer
 
-SamtalsBot är en AI-driven applikation som hjälper rektorer att leda strukturerade samtal med sin personal genom en kontrollerad 4-stegs process. Systemet använder OpenAI:s GPT-4 och Whisper för att analysera diskussioner och skapa handlingsplaner.
+Detta är en applikation som hjälper rektorer att leda strukturerade samtal med sin personal genom en kontrollerad 4-stegs process. Systemet använder OpenAI:s GPT-4 och Whisper för att analysera diskussioner och skapa handlingsplaner.
 
-## 🎯 Funktioner
+## Funktioner
 
 ### Steg 1: Problembeskrivning
 - Definiera problemet eller frågan som ska diskuteras
-- Få AI-förslag på hur du bäst presenterar det för gruppen
+- Få förslag på hur du bäst presenterar det för gruppen
 - Strukturerade diskussionsfrågor och mötesformat
 
-### Steg 2: Perspektivinventering  
+### Steg 2: Perspektivinventering
 - Spela in eller ladda upp gruppsamtal
-- Automatisk transkribering med Whisper
-- AI-analys av olika perspektiv och synvinklar
+- Automatisk transkribering
+- Analys av olika perspektiv och synvinklar
 
 ### Steg 3: Fördjupad diskussion
 - Fördjupa diskussionen kring utvalda perspektiv
-- AI-analys för att dra slutsatser och identifiera konsensus
+- Analys för att dra slutsatser och identifiera konsensus
 - Strukturerade rekommendationer för handlingsplan
 
 ### Steg 4: Handlingsplan
@@ -24,7 +24,7 @@ SamtalsBot är en AI-driven applikation som hjälper rektorer att leda strukture
 - Exportfunktion för färdig plan
 - Ansvar, tidsramar och uppföljning
 
-## 🚀 Installation
+## Installation
 
 ### Förutsättningar
 - Python 3.8 eller senare
@@ -35,7 +35,7 @@ SamtalsBot är en AI-driven applikation som hjälper rektorer att leda strukture
 1. **Klona projektet**
 ```bash
 git clone <repository-url>
-cd SamtalsBot
+cd Samtalsmodell
 ```
 
 2. **Skapa virtuell miljö**
@@ -53,7 +53,6 @@ pip install -r requirements.txt
 ```bash
 cp .env.example .env
 ```
-
 Redigera `.env` filen och lägg till din OpenAI API-nyckel:
 ```
 OPENAI_API_KEY=din_openai_api_nyckel_här
@@ -66,10 +65,10 @@ streamlit run main.py
 
 Applikationen öppnas automatiskt i din webbläsare på `http://localhost:8501`
 
-## 📁 Projektstruktur
+## Projektstruktur
 
 ```
-SamtalsBot/
+Samtalsmodell/
 ├── main.py                 # Huvudapplikation
 ├── pages/                  # Streamlit-sidor för varje steg
 │   ├── steg1.py            # Problembeskrivning
@@ -91,10 +90,10 @@ SamtalsBot/
 └── README.md              # Denna fil
 ```
 
-## 🔧 Konfiguration
+## Konfiguration
 
 ### OpenAI API
-Du behöver en OpenAI API-nyckel för att använda SamtalsBot. Skaffa en på [OpenAI:s webbplats](https://platform.openai.com/api-keys).
+Du behöver en OpenAI API-nyckel för att använda applikationen. Skaffa en på [OpenAI:s webbplats](https://platform.openai.com/api-keys).
 
 ### Ljudinspelning
 Applikationen stöder:
@@ -102,12 +101,12 @@ Applikationen stöder:
 - Direktinspelning i webbläsaren (kräver `streamlit-audio-recorder`)
 
 ### Databas
-SamtalsBot använder SQLite för lokal datalagring. Databasen skapas automatiskt vid första körningen.
+Applikationen använder SQLite för lokal datalagring. Databasen skapas automatiskt vid första körningen.
 
-## 📊 Användning
+## Användning
 
 1. **Skapa en ny session** med sessionens namn och ditt namn som rektor
-2. **Steg 1**: Beskriv problemet och få AI-förslag för presentation
+2. **Steg 1**: Beskriv problemet och få förslag för presentation
 3. **Steg 2**: Spela in gruppsamtal och få perspektivanalys
 4. **Steg 3**: Fördjupa diskussionen och få slutsatser
 5. **Steg 4**: Generera och exportera handlingsplan
@@ -115,17 +114,17 @@ SamtalsBot använder SQLite för lokal datalagring. Databasen skapas automatiskt
 ### Tips för bästa resultat
 - Använd tydliga problembeskrivningar
 - Se till att ljudkvaliteten är bra vid inspelning
-- Granska och redigera AI-förslag innan godkännande
+- Granska och redigera förslag innan godkännande
 - Spara regelbundet som utkast
 
-## 🔒 Säkerhet och Integritet
+## Säkerhet och Integritet
 
 - All data lagras lokalt på din dator
-- Ljudfiler krypteras och kan raderas automatiskt
+- Ljudfiler kan raderas automatiskt
 - GDPR-kompatibel datahantering
-- Ingen delning av data med tredje part (förutom OpenAI för AI-analys)
+- Ingen delning av data med tredje part (förutom OpenAI för analys)
 
-## 🛠️ Utveckling
+## Utveckling
 
 ### Köra i utvecklingsläge
 ```bash
@@ -143,15 +142,15 @@ python -m pytest tests/  # Om testerna implementeras
 3. Gör dina ändringar
 4. Skicka en pull request
 
-## 📋 Systemkrav
+## Systemkrav
 
 - **Python**: 3.8+
 - **RAM**: Minst 4GB (8GB rekommenderat)
 - **Lagring**: 1GB för applikation + utrymme för ljudfiler
-- **Internet**: Krävs för AI-funktionalitet
+- **Internet**: Krävs för analysfunktionalitet
 - **Webbläsare**: Modern webbläsare med JavaScript aktiverat
 
-## 🔧 Felsökning
+## Felsökning
 
 ### Vanliga problem
 
@@ -171,31 +170,31 @@ python -m pytest tests/  # Om testerna implementeras
 ### Loggar
 Streamlit-loggar visas i terminalen där applikationen körs.
 
-## 📞 Support
+## Support
 
 För support och frågor:
 - Skapa en issue på GitHub
 - Kontakta utvecklingsteamet
 
-## 📄 Licens
+## Licens
 
 Detta projekt är licensierat under MIT-licensen. Se LICENSE-filen för detaljer.
 
-## 🙏 Erkännanden
+## Erkännanden
 
 - OpenAI för GPT-4 och Whisper API
-- Streamlit för det fantastiska ramverket
+- Streamlit för ramverket
 - Svenska skolor som inspirerat till denna lösning
 
-## 🔄 Versionshistorik
+## Versionshistorik
 
 ### v1.0.0 (2024-06-03)
 - Initial release
 - Komplett 4-stegs process
-- AI-integration med OpenAI
+- Integration med OpenAI
 - Ljudtranskribering
 - Export av handlingsplaner
 
 ---
 
-**SamtalsBot** - Utvecklad för svenska rektorer som vill leda mer strukturerade och produktiva personalsamtal med AI-stöd.
+Samtalsmodell - Utvecklad för svenska rektorer som vill leda mer strukturerade och produktiva personalsamtal.
