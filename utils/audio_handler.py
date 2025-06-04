@@ -228,17 +228,23 @@ def record_audio_streamlit(session_id, step_number, key_prefix=""):
 
 def record_and_transcribe_audio(session_id, step_number, key_prefix=""):
     """
-    Spela in ljud med WebRTC och automatiskt spara + transkribera.
+    Spela in ljud och automatiskt spara + transkribera.
+    Försöker först WebRTC, sedan streamlit-audiorec som fallback.
     Returnerar tuple: (audio_file_path, transcription_text)
     """
     st.write("🎤 **Ljudinspelning:**")
     
+    # Försök WebRTC först
     try:
         from streamlit_webrtc import webrtc_streamer, WebRtcMode, RTCConfiguration
         import av
         import numpy as np
         import io
         import wave
+        
+        # Kontrollera om vi kör på Streamlit Cloud (begränsad WebRTC-support)
+        if "streamlit.io" in st.get_option("server.baseUrlPath", ""):
+            raise ImportError("WebRTC fungerar inte på Streamlit Cloud")
         
         # WebRTC konfiguration
         rtc_configuration = RTCConfiguration({
@@ -337,22 +343,65 @@ def record_and_transcribe_audio(session_id, step_number, key_prefix=""):
             
         return None, None
             
-    except ImportError:
-        # Fallback: Visa instruktioner för manuell uppladdning
-        st.warning("⚠️ Ljudinspelningskomponenten är inte tillgänglig.")
-        st.info("""
-        **Alternativ för ljudinspelning:**
-        1. Använd din telefon eller dator för att spela in ljud
-        2. Spara filen som .wav eller .mp3
-        3. Ladda upp filen med filuppladdaren ovan
-        """)
-        return None, None
-    except Exception as e:
-        st.error(f"Fel vid ljudinspelning: {e}")
-        st.info("""
-        **Alternativ för ljudinspelning:**
-        1. Använd din telefon eller dator för att spela in ljud
-        2. Spara filen som .wav eller .mp3
-        3. Ladda upp filen med filuppladdaren ovan
-        """)
-        return None, None
+    except (ImportError, Exception) as e:
+        # Fallback till streamlit-audiorec
+        st.warning("⚠️ WebRTC-inspelning inte tillgänglig. Försöker alternativ metod...")
+        
+        try:
+            from st_audiorec import st_audiorec
+            
+            component_key = f"{key_prefix}_audiorec_{session_id}_{step_number}"
+            
+            # Använd st_audiorec för ljudinspelning
+            audio_bytes = st_audiorec()
+            
+            if audio_bytes is not None:
+                st.success("✅ Ljudinspelning klar!")
+                st.audio(audio_bytes, format="audio/wav")
+                
+                # Spara ljudfilen automatiskt
+                with st.spinner("Sparar ljudfil..."):
+                    audio_file_path = save_recorded_audio(audio_bytes, session_id, step_number)
+                
+                if audio_file_path:
+                    st.success(f"💾 Ljudfil sparad: {os.path.basename(audio_file_path)}")
+                    
+                    # Transkribera automatiskt
+                    with st.spinner("Transkriberar ljud med OpenAI Whisper..."):
+                        transcription = transcribe_audio_openai(audio_file_path)
+                    
+                    if transcription:
+                        st.success("✅ Transkribering klar!")
+                        st.markdown("### 📝 Transkribering:")
+                        st.write(transcription)
+                        
+                        return audio_file_path, transcription
+                    else:
+                        st.error("❌ Transkribering misslyckades")
+                        return audio_file_path, None
+                else:
+                    st.error("❌ Kunde inte spara ljudfil")
+                    return None, None
+            else:
+                st.info("Klicka på mikrofon-knappen för att spela in ljud")
+                return None, None
+                
+        except ImportError:
+            # Sista fallback: Visa instruktioner för manuell uppladdning
+            st.error("❌ Ingen ljudinspelningskomponent tillgänglig.")
+            st.info("""
+            **Alternativ för ljudinspelning:**
+            1. Använd din telefon eller dator för att spela in ljud
+            2. Spara filen som .wav eller .mp3
+            3. Ladda upp filen med filuppladdaren ovan
+            """)
+            return None, None
+        except Exception as e:
+            st.error(f"Fel vid ljudinspelning: {e}")
+            st.info("""
+            **Alternativ för ljudinspelning:**
+            1. Använd din telefon eller dator för att spela in ljud
+            2. Spara filen som .wav eller .mp3
+            3. Ladda upp filen med filuppladdaren ovan
+            """)
+            return None, None
