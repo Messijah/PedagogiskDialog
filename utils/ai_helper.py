@@ -79,7 +79,7 @@ UNDERLAG: {conclusions}
 Skriv handlingsplanen tydligt och strukturerat på svenska.
 """
 
-MAX_CHUNK_SIZE = 4000  # tecken per del (justeras vid behov)
+MAX_CHUNK_SIZE = 2000  # sänkt till 2000 tecken per del
 
 # Hjälpfunktion för att dela upp text i bitar
 def split_text(text, max_length=MAX_CHUNK_SIZE):
@@ -93,7 +93,6 @@ def analyze_long_text(prompt_template, **kwargs):
         return None
     chunks = split_text(text)
     if len(chunks) == 1:
-        # Kort nog, analysera direkt
         prompt = prompt_template.format(**kwargs)
         return get_ai_response(prompt)
     else:
@@ -101,17 +100,46 @@ def analyze_long_text(prompt_template, **kwargs):
         delanalyser = []
         for idx, chunk in enumerate(chunks):
             st.info(f"Analyserar del {idx+1} av {len(chunks)}...")
-            # Skapa prompt för denna del
             local_kwargs = kwargs.copy()
             local_kwargs['transcript'] = chunk
             prompt = prompt_template.format(**local_kwargs)
-            delanalys = get_ai_response(prompt)
-            delanalyser.append(delanalys)
-        # Slå ihop delanalyserna
+            try:
+                delanalys = get_ai_response(prompt)
+                if delanalys:
+                    delanalyser.append(delanalys)
+                else:
+                    st.warning(f"Delanalys {idx+1} misslyckades och hoppas över.")
+            except Exception as e:
+                st.warning(f"Fel vid AI-analys av del {idx+1}: {e}. Hoppas över denna del.")
+        if not delanalyser:
+            st.error("Ingen delanalys lyckades. Försök korta ner texten eller dela upp samtalet manuellt.")
+            return None
+        # Slå ihop delanalyserna, men om det blir för långt, dela även dessa
         sammanfattningsprompt = (
             "Du är en samtalscoach för rektorer. Här är delanalyser av ett långt samtal. Sammanfatta och strukturera huvuddragen, viktiga perspektiv och slutsatser så att det blir en helhetsbild enligt LPGD-modellen.\n\nDELANALYSER:\n" + "\n\n".join(delanalyser)
         )
-        return get_ai_response(sammanfattningsprompt)
+        # Om prompten är för lång, dela även delanalyserna i mindre grupper
+        if len(sammanfattningsprompt) > MAX_CHUNK_SIZE * 2:
+            st.info("Slutlig sammanfattning delas upp i flera steg...")
+            sammanfattningar = []
+            delgrupper = split_text("\n\n".join(delanalyser), MAX_CHUNK_SIZE)
+            for i, grupp in enumerate(delgrupper):
+                st.info(f"Sammanfattar delgrupp {i+1} av {len(delgrupper)}...")
+                prompt = (
+                    "Du är en samtalscoach för rektorer. Här är delanalyser av ett långt samtal. Sammanfatta och strukturera huvuddragen, viktiga perspektiv och slutsatser så att det blir en helhetsbild enligt LPGD-modellen.\n\nDELANALYSER:\n" + grupp
+                )
+                sammanfattning = get_ai_response(prompt)
+                if sammanfattning:
+                    sammanfattningar.append(sammanfattning)
+                else:
+                    st.warning(f"Sammanfattning av delgrupp {i+1} misslyckades.")
+            # Slutlig sammanfattning av alla delgruppssammanfattningar
+            slutprompt = (
+                "Du är en samtalscoach för rektorer. Här är flera del-sammanfattningar av ett långt samtal. Slå ihop till en slutlig, övergripande sammanfattning enligt LPGD-modellen.\n\nSAMMANFATTNINGAR:\n" + "\n\n".join(sammanfattningar)
+            )
+            return get_ai_response(slutprompt)
+        else:
+            return get_ai_response(sammanfattningsprompt)
 
 @st.cache_data(show_spinner=False)
 def get_ai_response(prompt, max_tokens=2000):
