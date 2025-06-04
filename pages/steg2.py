@@ -3,6 +3,7 @@ from utils.session_manager import get_current_session, is_step_accessible
 from utils.ai_helper import analyze_perspectives_steg2
 from utils.database import update_session_step2
 from utils.audio_handler import transcribe_uploaded_file, validate_audio_file, display_audio_player, record_audio_streamlit, save_recorded_audio, transcribe_audio_openai
+from utils.audio_text_input import audio_text_input
 
 # Konfigurera sida
 st.set_page_config(
@@ -28,6 +29,12 @@ if not current_session:
 # Header
 st.title("👥 Steg 2: Perspektivinventering")
 st.markdown(f"**Session:** {current_session['session_name']} | **Rektor:** {current_session['rektor_name']}")
+
+# === NY INSTRUKTION ===
+st.info("""
+**Nu ska du genomföra ett samtal med din personalgrupp utifrån problemformuleringen från Steg 1.**\n\nEfter samtalet laddar du upp eller klistrar in transkriberingen från detta samtal här nedan.\n\n> Steg 2 handlar om att samla in olika perspektiv på problemet genom ett samtal, inte att analysera samma text som i Steg 1.
+""")
+# === SLUT NY INSTRUKTION ===
 
 # Navigation
 col1, col2, col3 = st.columns([1, 1, 3])
@@ -87,84 +94,13 @@ Nu ska du genomföra ett samtal med din personalgrupp där olika perspektiv på 
 4. **Välj** vilka perspektiv som ska fördjupas i Steg 3
 """)
 
-# Ljudinspelning/uppladdning
-st.markdown("---")
-st.subheader("🎤 Spela in eller ladda upp samtal")
-
-# Flikar för olika alternativ
-tab1, tab2 = st.tabs(["📁 Ladda upp ljudfil", "🎤 Spela in direkt"])
-
-with tab1:
-    st.markdown("**Ladda upp en ljudfil från ditt samtal:**")
-    
-    uploaded_file = st.file_uploader(
-        "Välj ljudfil",
-        type=['wav', 'mp3', 'm4a', 'mp4'],
-        help="Stödda format: WAV, MP3, M4A, MP4. Max storlek: 200 MB"
-    )
-    
-    if uploaded_file:
-        # Validera fil
-        is_valid, message = validate_audio_file(uploaded_file)
-        
-        if is_valid:
-            st.success(f"✅ Fil uppladdad: {uploaded_file.name}")
-            
-            # Visa ljudspelare
-            st.audio(uploaded_file.getvalue())
-            
-            # Transkribera knapp
-            if st.button("🔤 Transkribera ljudfil", type="primary"):
-                with st.spinner("Transkriberar ljudfil... Detta kan ta några minuter."):
-                    try:
-                        transcript, audio_path = transcribe_uploaded_file(
-                            uploaded_file, 
-                            current_session['id'], 
-                            2
-                        )
-                        
-                        if transcript:
-                            st.session_state.transcript_steg2 = transcript
-                            st.session_state.audio_path_steg2 = audio_path
-                            st.success("✅ Transkribering klar!")
-                            st.rerun()
-                        else:
-                            st.error("Kunde inte transkribera filen. Kontrollera att det är en giltig ljudfil.")
-                    except Exception as e:
-                        st.error(f"Fel vid transkribering: {str(e)}")
-        else:
-            st.error(f"❌ {message}")
-
-with tab2:
-    st.markdown("**Spela in direkt i webbläsaren:**")
-    
-    # Försök använda streamlit-audio-recorder
-    try:
-        audio_bytes = record_audio_streamlit()
-        
-        if audio_bytes:
-            st.success("✅ Inspelning mottagen!")
-            
-            if st.button("🔤 Transkribera inspelning", type="primary"):
-                with st.spinner("Sparar och transkriberar inspelning..."):
-                    try:
-                        # Spara inspelning
-                        audio_path = save_recorded_audio(audio_bytes, current_session['id'], 2)
-                        
-                        # Transkribera
-                        transcript = transcribe_audio_openai(audio_path)
-                        
-                        if transcript:
-                            st.session_state.transcript_steg2 = transcript
-                            st.session_state.audio_path_steg2 = audio_path
-                            st.success("✅ Transkribering klar!")
-                            st.rerun()
-                        else:
-                            st.error("Kunde inte transkribera inspelningen.")
-                    except Exception as e:
-                        st.error(f"Fel vid transkribering: {str(e)}")
-    except:
-        st.warning("Direktinspelning inte tillgänglig. Använd filuppladdning istället.")
+# === NYTT: Gemensam komponent för ljud/text ===
+transcript, audio_path = audio_text_input(2, current_session['id'], key_prefix="steg2")
+if transcript:
+    st.session_state.transcript_steg2 = transcript
+    if audio_path:
+        st.session_state.audio_path_steg2 = audio_path
+# === SLUT NYTT ===
 
 # Visa transkribering om den finns
 if 'transcript_steg2' in st.session_state or current_session.get('steg2_transcript'):

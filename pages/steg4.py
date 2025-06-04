@@ -4,6 +4,7 @@ from utils.session_manager import get_current_session, is_step_accessible
 from utils.ai_helper import create_action_plan_steg4
 from utils.database import update_session_step4
 import io
+from utils.audio_text_input import audio_text_input
 
 # Konfigurera sida
 st.set_page_config(
@@ -29,6 +30,16 @@ if not current_session:
 # Header
 st.title("📋 Steg 4: Handlingsplan")
 st.markdown(f"**Session:** {current_session['session_name']} | **Rektor:** {current_session['rektor_name']}")
+
+from utils.audio_text_input import audio_text_input
+
+# === NYTT: Gemensam komponent för ljud/text ===
+transcript, audio_path = audio_text_input(4, current_session['id'], key_prefix="steg4")
+if transcript:
+    st.session_state.transcript_steg4 = transcript
+    if audio_path:
+        st.session_state.audio_path_steg4 = audio_path
+# === SLUT NYTT ===
 
 # Navigation
 col1, col2, col3 = st.columns([1, 1, 3])
@@ -63,6 +74,10 @@ with st.expander("Visa fullständig sammanfattning"):
             st.info(current_session['steg3_conclusions'])
         else:
             st.warning("Inga slutsatser dokumenterade")
+
+# Visa info om att man kan skapa handlingsplan direkt från transkribering
+if st.session_state.get('transcript_steg4'):
+    st.info("Du har laddat upp/klistrat in en transkribering. AI:n kommer att använda denna som underlag för handlingsplanen.")
 
 # Visa befintlig handlingsplan om den finns
 if current_session['steg4_approved']:
@@ -142,13 +157,15 @@ additional_info = st.text_area(
 
 # Skapa handlingsplan
 if st.button("🤖 Skapa handlingsplan", type="primary"):
-    if not current_session.get('steg3_conclusions'):
-        st.error("Inga slutsatser från Steg 3 hittades. Gå tillbaka och slutför Steg 3 först.")
+    # Använd transkribering om den finns, annars slutsatser från steg 3
+    slutsats_input = st.session_state.get('transcript_steg4') or current_session.get('steg3_conclusions')
+    if not slutsats_input:
+        st.error("Ingen transkribering eller slutsatser från Steg 3 hittades. Ladda upp/klistra in en transkribering eller gå tillbaka och slutför Steg 3 först.")
     else:
         with st.spinner("AI skapar en strukturerad handlingsplan baserat på era diskussioner..."):
             handlingsplan = create_action_plan_steg4(
                 current_session['problem_beskrivning'],
-                current_session['steg3_conclusions'],
+                slutsats_input,
                 additional_info
             )
             

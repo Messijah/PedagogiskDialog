@@ -2,6 +2,7 @@ import streamlit as st
 from utils.session_manager import get_current_session, is_step_accessible
 from utils.ai_helper import get_ai_suggestion_steg1
 from utils.database import update_session_step1
+from utils.audio_text_input import audio_text_input
 
 # Konfigurera sida
 st.set_page_config(
@@ -26,60 +27,13 @@ if not current_session:
 st.title("🎯 Steg 1: Problembeskrivning och Presentation")
 st.markdown(f"**Session:** {current_session['session_name']} | **Rektor:** {current_session['rektor_name']}")
 
-# --- VISA ALLTID: Ladda upp transkribering (ljud eller text) ---
-try:
-    st.markdown("---")
-    st.subheader("📤 Ladda upp transkribering (valfritt)")
-    col1, col2 = st.columns(2)
-    with col1:
-        uploaded_audio = st.file_uploader(
-            "Ladda upp ljudfil för transkribering (WAV/MP3/M4A/MP4)",
-            type=["wav", "mp3", "m4a", "mp4"],
-            key="audio_upload_steg1"
-        )
-        if uploaded_audio:
-            from utils.audio_handler import transcribe_uploaded_file, validate_audio_file
-            is_valid, message = validate_audio_file(uploaded_audio)
-            if is_valid:
-                st.success(f"✅ Fil uppladdad: {uploaded_audio.name}")
-                if st.button("🔤 Transkribera ljudfil", key="transcribe_audio_steg1"):
-                    with st.spinner("Transkriberar ljudfil... Detta kan ta några minuter."):
-                        transcript, audio_path = transcribe_uploaded_file(
-                            uploaded_audio, current_session['id'], 1
-                        )
-                        if transcript:
-                            st.session_state.transcript_steg1 = transcript
-                            st.success("✅ Transkribering klar!")
-                            st.rerun()
-                        else:
-                            st.error("Kunde inte transkribera filen. Kontrollera att det är en giltig ljudfil.")
-            else:
-                st.error(f"❌ {message}")
-    with col2:
-        uploaded_text = st.file_uploader(
-            "Ladda upp färdig transkribering (TXT)",
-            type=["txt"],
-            key="text_upload_steg1"
-        )
-        if uploaded_text:
-            transcript_text = uploaded_text.read().decode("utf-8")
-            st.session_state.transcript_steg1 = transcript_text
-            st.success("✅ Texttranskribering uppladdad!")
-            st.rerun()
-    # Visa transkribering om den finns
-    if 'transcript_steg1' in st.session_state:
-        st.markdown("---")
-        st.subheader("📝 Transkribering (Steg 1)")
-        edited_transcript = st.text_area(
-            "Granska och redigera transkriberingen om nödvändigt:",
-            value=st.session_state.transcript_steg1,
-            height=300,
-            help="Du kan redigera transkriberingen för att korrigera eventuella fel"
-        )
-        if edited_transcript != st.session_state.transcript_steg1:
-            st.session_state.transcript_steg1 = edited_transcript
-except Exception as e:
-    st.error(f"Fel i uppladdningssektionen: {e}")
+# === NYTT: Gemensam komponent för ljud/text ===
+transcript, audio_path = audio_text_input(1, current_session['id'], key_prefix="steg1")
+if transcript:
+    st.session_state.transcript_steg1 = transcript
+    if audio_path:
+        st.session_state.audio_path_steg1 = audio_path
+# === SLUT NYTT ===
 
 # Navigation
 col1, col2 = st.columns([1, 4])
