@@ -5,6 +5,9 @@ from utils.ai_helper import create_action_plan_steg4
 from utils.database import update_session_step4
 import io
 from utils.audio_text_input import audio_text_input
+from reportlab.lib.pagesizes import A4
+from reportlab.pdfgen import canvas
+import tempfile
 
 # Konfigurera sida
 st.set_page_config(
@@ -117,6 +120,61 @@ HANDLINGSPLAN:
                 file_name=f"handlingsplan_{current_session['session_name'].replace(' ', '_')}_{datetime.now().strftime('%Y%m%d')}.txt",
                 mime="text/plain"
             )
+
+            # --- PDF-export ---
+            if st.button("⬇️ Spara som PDF"):
+                with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as tmp_pdf:
+                    c = canvas.Canvas(tmp_pdf.name, pagesize=A4)
+                    width, height = A4
+                    y = height - 40
+                    c.setFont("Helvetica-Bold", 16)
+                    c.drawString(40, y, f"HANDLINGSPLAN - {current_session['session_name']}")
+                    y -= 30
+                    c.setFont("Helvetica", 12)
+                    c.drawString(40, y, f"Rektor: {current_session['rektor_name']}")
+                    y -= 20
+                    c.drawString(40, y, f"Datum: {datetime.now().strftime('%Y-%m-%d')}")
+                    y -= 30
+                    c.setFont("Helvetica-Bold", 12)
+                    c.drawString(40, y, "PROBLEMFORMULERING:")
+                    y -= 20
+                    c.setFont("Helvetica", 12)
+                    for line in str(current_session['problem_beskrivning']).split('\n'):
+                        c.drawString(50, y, line)
+                        y -= 15
+                    y -= 10
+                    c.setFont("Helvetica-Bold", 12)
+                    c.drawString(40, y, "VALDA PERSPEKTIV:")
+                    y -= 20
+                    c.setFont("Helvetica", 12)
+                    for line in str(current_session.get('steg2_selected_perspectives', 'Ej dokumenterat')).split('\n'):
+                        c.drawString(50, y, line)
+                        y -= 15
+                    y -= 10
+                    c.setFont("Helvetica-Bold", 12)
+                    c.drawString(40, y, "SLUTSATSER:")
+                    y -= 20
+                    c.setFont("Helvetica", 12)
+                    for line in str(current_session.get('steg3_conclusions', 'Ej dokumenterat')).split('\n'):
+                        c.drawString(50, y, line)
+                        y -= 15
+                    y -= 10
+                    c.setFont("Helvetica-Bold", 12)
+                    c.drawString(40, y, "HANDLINGSPLAN:")
+                    y -= 20
+                    c.setFont("Helvetica", 12)
+                    for line in str(current_session['steg4_handlingsplan']).split('\n'):
+                        c.drawString(50, y, line)
+                        y -= 15
+                    c.save()
+                    tmp_pdf.seek(0)
+                    with open(tmp_pdf.name, "rb") as f:
+                        st.download_button(
+                            label="📄 Ladda ner som PDF",
+                            data=f.read(),
+                            file_name=f"handlingsplan_{current_session['session_name'].replace(' ', '_')}_{datetime.now().strftime('%Y%m%d')}.pdf",
+                            mime="application/pdf"
+                        )
         
         with col2:
             if st.button("📝 Redigera handlingsplan"):
