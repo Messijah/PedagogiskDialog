@@ -6,7 +6,7 @@ from utils.ai_helper import validate_api_key
 
 # Konfigurera Streamlit
 st.set_page_config(
-    page_title="Samtalsmodell - AI-stödd samtalsprocess",
+    page_title="Pedagogiskt samtalsstöd",
     page_icon=None,
     layout="wide",
     initial_sidebar_state="expanded"
@@ -17,8 +17,8 @@ init_session()
 
 # Sidebar för session management
 with st.sidebar:
-    st.title("Samtalsmodell")
-    st.markdown("AI-stödd samtalsprocess för rektorer")
+    st.title("Pedagogiskt samtalsstöd")
+    st.markdown("Stöd för strukturerade personalsamtal")
     
     # API Key kontroll
     if not validate_api_key():
@@ -90,26 +90,25 @@ with st.sidebar:
                     st.rerun()
 
 # Huvudinnehåll
-st.title("Samtalsmodell")
-st.subheader("AI-stödd samtalsprocess för rektorer")
+st.title("Pedagogiskt samtalsstöd")
 
 # Kontrollera om vi har en aktiv session
 if not current_session:
     st.info("Skapa eller välj en session i sidopanelen för att komma igång.")
     st.markdown("""
-    Denna tjänst hjälper dig som rektor att leda strukturerade samtal med din personal genom en 4-stegs process:
+    Detta verktyg hjälper dig som rektor att leda strukturerade samtal med din personal genom en tydlig 4-stegs process:
 
     **Steg 1: Problembeskrivning**
     - Definiera problemet eller frågan som ska diskuteras
-    - Få AI-förslag på hur du kan presentera det för gruppen
+    - Få stöd för hur du kan presentera det för gruppen
 
     **Steg 2: Perspektivinventering**
     - Spela in gruppsamtalet där olika perspektiv framkommer
-    - AI analyserar och kategoriserar de olika synvinklarna
+    - Sammanfatta och kategorisera de olika synvinklarna
 
     **Steg 3: Fördjupad diskussion**
     - Fördjupa diskussionen kring utvalda perspektiv
-    - AI hjälper till att dra slutsatser och identifiera konsensus
+    - Identifiera slutsatser och konsensus
 
     **Steg 4: Handlingsplan**
     - Skapa en strukturerad handlingsplan baserat på diskussionen
