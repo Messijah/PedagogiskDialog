@@ -187,4 +187,3 @@ if current_session['problem_beskrivning']:
 
 # Footer
 st.markdown("---")
-st.caption("SamtalsBot - AI-stödd samtalsmodell för rektorer | Utvecklad för svenska skolor")
