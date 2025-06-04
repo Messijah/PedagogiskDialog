@@ -154,18 +154,21 @@ with st.form("problem_form"):
 
 # Hantera formulärinlämning
 if submit_button:
-    if not problem_beskrivning.strip():
-        st.error("Du måste beskriva problemet innan du kan få AI-förslag.")
+    # Om problembeskrivning är tom, men transkribering finns, använd transkriberingen
+    pb = problem_beskrivning.strip()
+    transcript = st.session_state.get('transcript_steg1', '').strip()
+    if not pb and transcript:
+        pb = transcript
+    if not pb:
+        st.error("Du måste antingen beskriva problemet eller ladda upp en transkribering innan du kan få AI-förslag.")
     else:
         # Spara input i session state
-        st.session_state.current_problem = problem_beskrivning
+        st.session_state.current_problem = pb
         st.session_state.current_personal_grupp = personal_grupp
         st.session_state.current_kontext = kontext
-        
         # Hämta AI-förslag
         with st.spinner("AI analyserar ditt problem och skapar förslag..."):
-            ai_suggestion = get_ai_suggestion_steg1(problem_beskrivning, personal_grupp, kontext)
-            
+            ai_suggestion = get_ai_suggestion_steg1(pb, personal_grupp, kontext)
             if ai_suggestion:
                 st.session_state.ai_suggestion_steg1 = ai_suggestion
                 st.rerun()
