@@ -1,9 +1,10 @@
 import streamlit as st
-import whisper
 import os
 import tempfile
 from datetime import datetime
 import io
+
+# Kräver openai-whisper i requirements.txt
 
 def save_uploaded_audio(uploaded_file, session_id, step_number):
     """Spara uppladdad ljudfil"""
@@ -26,6 +27,7 @@ def save_uploaded_audio(uploaded_file, session_id, step_number):
 def transcribe_audio_whisper(audio_file_path):
     """Transkribera ljudfil med Whisper"""
     try:
+        import whisper
         # Ladda Whisper modell
         model = whisper.load_model("base")
         

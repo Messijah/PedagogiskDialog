@@ -35,6 +35,8 @@ def load_session(session_id):
 
 def get_current_session():
     """Hämta aktuell session data"""
+    if 'session_id' not in st.session_state:
+        st.session_state.session_id = None
     if st.session_state.session_id:
         # Uppdatera session data från databas
         st.session_state.session_data = get_session(st.session_state.session_id)
