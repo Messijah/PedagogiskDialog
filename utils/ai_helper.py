@@ -2,6 +2,7 @@ import openai
 import streamlit as st
 import os
 from dotenv import load_dotenv
+import math
 
 # Ladda miljövariabler
 load_dotenv()
@@ -78,6 +79,40 @@ UNDERLAG: {conclusions}
 Skriv handlingsplanen tydligt och strukturerat på svenska.
 """
 
+MAX_CHUNK_SIZE = 4000  # tecken per del (justeras vid behov)
+
+# Hjälpfunktion för att dela upp text i bitar
+def split_text(text, max_length=MAX_CHUNK_SIZE):
+    return [text[i:i+max_length] for i in range(0, len(text), max_length)]
+
+# Ny hjälpfunktion för att analysera långa texter stegvis
+@st.cache_data(show_spinner=False)
+def analyze_long_text(prompt_template, **kwargs):
+    text = kwargs.get('transcript') or kwargs.get('conclusions')
+    if not text:
+        return None
+    chunks = split_text(text)
+    if len(chunks) == 1:
+        # Kort nog, analysera direkt
+        prompt = prompt_template.format(**kwargs)
+        return get_ai_response(prompt)
+    else:
+        st.info(f"Transkriberingen är lång ({len(text)} tecken). AI:n analyserar i {len(chunks)} steg – detta kan ta lite längre tid.")
+        delanalyser = []
+        for idx, chunk in enumerate(chunks):
+            st.info(f"Analyserar del {idx+1} av {len(chunks)}...")
+            # Skapa prompt för denna del
+            local_kwargs = kwargs.copy()
+            local_kwargs['transcript'] = chunk
+            prompt = prompt_template.format(**local_kwargs)
+            delanalys = get_ai_response(prompt)
+            delanalyser.append(delanalys)
+        # Slå ihop delanalyserna
+        sammanfattningsprompt = (
+            "Du är en samtalscoach för rektorer. Här är delanalyser av ett långt samtal. Sammanfatta och strukturera huvuddragen, viktiga perspektiv och slutsatser så att det blir en helhetsbild enligt LPGD-modellen.\n\nDELANALYSER:\n" + "\n\n".join(delanalyser)
+        )
+        return get_ai_response(sammanfattningsprompt)
+
 @st.cache_data(show_spinner=False)
 def get_ai_response(prompt, max_tokens=2000):
     """Hämta AI-svar från OpenAI"""
@@ -106,30 +141,30 @@ def get_ai_suggestion_steg1(problem_beskrivning, personal_grupp, kontext=""):
     return get_ai_response(prompt)
 
 def analyze_perspectives_steg2(problem_beskrivning, transcript):
-    """Analysera perspektiv för Steg 2"""
-    prompt = STEG2_PROMPT.format(
+    """Analysera perspektiv för Steg 2, stöd för långa transkriberingar"""
+    return analyze_long_text(
+        STEG2_PROMPT,
         problem_beskrivning=problem_beskrivning,
         transcript=transcript
     )
-    return get_ai_response(prompt)
 
 def analyze_discussion_steg3(problem_beskrivning, selected_perspectives, transcript):
-    """Analysera fördjupad diskussion för Steg 3"""
-    prompt = STEG3_PROMPT.format(
+    """Analysera fördjupad diskussion för Steg 3, stöd för långa transkriberingar"""
+    return analyze_long_text(
+        STEG3_PROMPT,
         problem_beskrivning=problem_beskrivning,
         selected_perspectives=selected_perspectives,
         transcript=transcript
     )
-    return get_ai_response(prompt)
 
 def create_action_plan_steg4(problem_beskrivning, conclusions, action_suggestions=""):
-    """Skapa handlingsplan för Steg 4"""
-    prompt = STEG4_PROMPT.format(
+    """Skapa handlingsplan för Steg 4, stöd för långa slutsatser/transkriberingar"""
+    return analyze_long_text(
+        STEG4_PROMPT,
         problem_beskrivning=problem_beskrivning,
         conclusions=conclusions,
         action_suggestions=action_suggestions
     )
-    return get_ai_response(prompt, max_tokens=3000)
 
 def validate_api_key():
     """Validera att OpenAI API-nyckel är konfigurerad"""
