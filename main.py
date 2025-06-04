@@ -6,8 +6,8 @@ from utils.ai_helper import validate_api_key
 
 # Konfigurera Streamlit
 st.set_page_config(
-    page_title="SamtalsBot - AI-stödd Samtalsmodell",
-    page_icon="🗣️",
+    page_title="Samtalsmodell - AI-stödd samtalsprocess",
+    page_icon=None,
     layout="wide",
     initial_sidebar_state="expanded"
 )
@@ -17,8 +17,8 @@ init_session()
 
 # Sidebar för session management
 with st.sidebar:
-    st.title("🗣️ SamtalsBot")
-    st.markdown("*AI-stödd samtalsmodell för rektorer*")
+    st.title("Samtalsmodell")
+    st.markdown("AI-stödd samtalsprocess för rektorer")
     
     # API Key kontroll
     if not validate_api_key():
@@ -90,38 +90,31 @@ with st.sidebar:
                     st.rerun()
 
 # Huvudinnehåll
-st.title("🗣️ SamtalsBot")
-st.subheader("AI-stödd samtalsmodell för rektorer")
+st.title("Samtalsmodell")
+st.subheader("AI-stödd samtalsprocess för rektorer")
 
 # Kontrollera om vi har en aktiv session
 if not current_session:
-    st.info("👈 Skapa eller välj en session i sidopanelen för att komma igång.")
-    
-    # Visa information om systemet
+    st.info("Skapa eller välj en session i sidopanelen för att komma igång.")
     st.markdown("""
-    ## Välkommen till SamtalsBot!
-    
-    SamtalsBot hjälper dig som rektor att leda strukturerade samtal med din personal genom en 4-stegs process:
-    
-    ### 🎯 Steg 1: Problembeskrivning
+    Denna tjänst hjälper dig som rektor att leda strukturerade samtal med din personal genom en 4-stegs process:
+
+    **Steg 1: Problembeskrivning**
     - Definiera problemet eller frågan som ska diskuteras
-    - Få AI-förslag på hur du bäst presenterar det för gruppen
-    
-    ### 👥 Steg 2: Perspektivinventering  
+    - Få AI-förslag på hur du kan presentera det för gruppen
+
+    **Steg 2: Perspektivinventering**
     - Spela in gruppsamtalet där olika perspektiv framkommer
     - AI analyserar och kategoriserar de olika synvinklarna
-    
-    ### 🔍 Steg 3: Fördjupad diskussion
+
+    **Steg 3: Fördjupad diskussion**
     - Fördjupa diskussionen kring utvalda perspektiv
     - AI hjälper till att dra slutsatser och identifiera konsensus
-    
-    ### 📋 Steg 4: Handlingsplan
+
+    **Steg 4: Handlingsplan**
     - Skapa en strukturerad handlingsplan baserat på diskussionen
     - Exportera färdig plan med ansvar, tidsramar och uppföljning
-    
-    **Kom igång genom att skapa en ny session i sidopanelen!**
     """)
-    
     st.stop()
 
 # Navigation för stegen
@@ -137,46 +130,42 @@ col1, col2, col3, col4 = st.columns(4)
 with col1:
     accessible = is_step_accessible(1)
     if accessible:
-        if st.button("🎯 Steg 1: Problem", type="primary" if current_session['current_step'] == 1 else "secondary", use_container_width=True):
+        if st.button("Steg 1: Problem", type="primary" if current_session['current_step'] == 1 else "secondary", use_container_width=True):
             st.switch_page("pages/steg1.py")
     else:
-        st.button("🎯 Steg 1: Problem", disabled=True, use_container_width=True)
-    
+        st.button("Steg 1: Problem", disabled=True, use_container_width=True)
     if current_session['steg1_approved']:
-        st.success("✅ Slutfört")
+        st.success("Slutfört")
 
 with col2:
     accessible = is_step_accessible(2)
     if accessible:
-        if st.button("👥 Steg 2: Perspektiv", type="primary" if current_session['current_step'] == 2 else "secondary", use_container_width=True):
+        if st.button("Steg 2: Perspektiv", type="primary" if current_session['current_step'] == 2 else "secondary", use_container_width=True):
             st.switch_page("pages/steg2.py")
     else:
-        st.button("👥 Steg 2: Perspektiv", disabled=True, use_container_width=True)
-    
+        st.button("Steg 2: Perspektiv", disabled=True, use_container_width=True)
     if current_session['steg2_approved']:
-        st.success("✅ Slutfört")
+        st.success("Slutfört")
 
 with col3:
     accessible = is_step_accessible(3)
     if accessible:
-        if st.button("🔍 Steg 3: Fördjupning", type="primary" if current_session['current_step'] == 3 else "secondary", use_container_width=True):
+        if st.button("Steg 3: Fördjupning", type="primary" if current_session['current_step'] == 3 else "secondary", use_container_width=True):
             st.switch_page("pages/steg3.py")
     else:
-        st.button("🔍 Steg 3: Fördjupning", disabled=True, use_container_width=True)
-    
+        st.button("Steg 3: Fördjupning", disabled=True, use_container_width=True)
     if current_session['steg3_approved']:
-        st.success("✅ Slutfört")
+        st.success("Slutfört")
 
 with col4:
     accessible = is_step_accessible(4)
     if accessible:
-        if st.button("📋 Steg 4: Handlingsplan", type="primary" if current_session['current_step'] == 4 else "secondary", use_container_width=True):
+        if st.button("Steg 4: Handlingsplan", type="primary" if current_session['current_step'] == 4 else "secondary", use_container_width=True):
             st.switch_page("pages/steg4.py")
     else:
-        st.button("📋 Steg 4: Handlingsplan", disabled=True, use_container_width=True)
-    
+        st.button("Steg 4: Handlingsplan", disabled=True, use_container_width=True)
     if current_session['steg4_approved']:
-        st.success("✅ Slutfört")
+        st.success("Slutfört")
 
 # Visa aktuell session information
 st.markdown("---")
