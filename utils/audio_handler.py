@@ -102,13 +102,14 @@ def display_audio_player(audio_file_path):
 
 def record_audio_streamlit(session_id, step_number, key_prefix=""):
     """
-    Spela in ljud med komponenten streamlit_audio_recorder.
+    Spela in ljud med komponenten streamlit_audiorec.
     Returnerar inspelade ljudet som bytes, annars None.
     """
     try:
-        from streamlit_audio_recorder import audio_recorder
+        # OBS: paketet heter streamlit-audiorec, vilket exponerar modulen streamlit_audiorec
+        from streamlit_audiorec import audio_recorder
     except ImportError:
-        st.error("streamlit_audio_recorder saknas. Lägg till i requirements.txt.")
+        st.error("streamlit_audiorec saknas. Kontrollera att ni har lagt till 'git+https://github.com/stefanrmmr/streamlit_audio_recorder' i requirements.txt och redeployat.")
         return None
 
     st.write("🎤 **Klicka på knappen nedan för att spela in ljud:**")
