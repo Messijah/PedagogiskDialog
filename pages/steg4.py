@@ -8,6 +8,10 @@ from utils.audio_text_input import audio_text_input
 from reportlab.lib.pagesizes import A4
 from reportlab.pdfgen import canvas
 import tempfile
+from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer
+from reportlab.lib.enums import TA_LEFT
+from reportlab.lib.units import mm
 
 # Konfigurera sida
 st.set_page_config(
@@ -121,60 +125,37 @@ HANDLINGSPLAN:
                 mime="text/plain"
             )
 
-            # --- PDF-export ---
-            if st.button("⬇️ Spara som PDF"):
-                with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as tmp_pdf:
-                    c = canvas.Canvas(tmp_pdf.name, pagesize=A4)
-                    width, height = A4
-                    y = height - 40
-                    c.setFont("Helvetica-Bold", 16)
-                    c.drawString(40, y, f"HANDLINGSPLAN - {current_session['session_name']}")
-                    y -= 30
-                    c.setFont("Helvetica", 12)
-                    c.drawString(40, y, f"Rektor: {current_session['rektor_name']}")
-                    y -= 20
-                    c.drawString(40, y, f"Datum: {datetime.now().strftime('%Y-%m-%d')}")
-                    y -= 30
-                    c.setFont("Helvetica-Bold", 12)
-                    c.drawString(40, y, "PROBLEMFORMULERING:")
-                    y -= 20
-                    c.setFont("Helvetica", 12)
-                    for line in str(current_session['problem_beskrivning']).split('\n'):
-                        c.drawString(50, y, line)
-                        y -= 15
-                    y -= 10
-                    c.setFont("Helvetica-Bold", 12)
-                    c.drawString(40, y, "VALDA PERSPEKTIV:")
-                    y -= 20
-                    c.setFont("Helvetica", 12)
-                    for line in str(current_session.get('steg2_selected_perspectives', 'Ej dokumenterat')).split('\n'):
-                        c.drawString(50, y, line)
-                        y -= 15
-                    y -= 10
-                    c.setFont("Helvetica-Bold", 12)
-                    c.drawString(40, y, "SLUTSATSER:")
-                    y -= 20
-                    c.setFont("Helvetica", 12)
-                    for line in str(current_session.get('steg3_conclusions', 'Ej dokumenterat')).split('\n'):
-                        c.drawString(50, y, line)
-                        y -= 15
-                    y -= 10
-                    c.setFont("Helvetica-Bold", 12)
-                    c.drawString(40, y, "HANDLINGSPLAN:")
-                    y -= 20
-                    c.setFont("Helvetica", 12)
-                    for line in str(current_session['steg4_handlingsplan']).split('\n'):
-                        c.drawString(50, y, line)
-                        y -= 15
-                    c.save()
-                    tmp_pdf.seek(0)
-                    with open(tmp_pdf.name, "rb") as f:
-                        st.download_button(
-                            label="📄 Ladda ner som PDF",
-                            data=f.read(),
-                            file_name=f"handlingsplan_{current_session['session_name'].replace(' ', '_')}_{datetime.now().strftime('%Y%m%d')}.pdf",
-                            mime="application/pdf"
-                        )
+            # --- Snygg PDF-export ---
+            def create_pdf():
+                buffer = tempfile.NamedTemporaryFile(delete=False, suffix=".pdf")
+                doc = SimpleDocTemplate(buffer.name, pagesize=A4, rightMargin=30, leftMargin=30, topMargin=30, bottomMargin=30)
+                styles = getSampleStyleSheet()
+                styles.add(ParagraphStyle(name='Rubrik', fontSize=18, leading=22, spaceAfter=12, alignment=TA_LEFT, fontName="Helvetica-Bold"))
+                styles.add(ParagraphStyle(name='Mellanrubrik', fontSize=14, leading=18, spaceAfter=8, fontName="Helvetica-Bold"))
+                styles.add(ParagraphStyle(name='Brödtext', fontSize=12, leading=16, spaceAfter=8, fontName="Helvetica"))
+                elements = []
+                elements.append(Paragraph(f"HANDLINGSPLAN - {current_session['session_name']}", styles['Rubrik']))
+                elements.append(Paragraph(f"Rektor: {current_session['rektor_name']}", styles['Brödtext']))
+                elements.append(Paragraph(f"Datum: {datetime.now().strftime('%Y-%m-%d')}", styles['Brödtext']))
+                elements.append(Spacer(1, 8*mm))
+                elements.append(Paragraph("PROBLEMFORMULERING:", styles['Mellanrubrik']))
+                elements.append(Paragraph(current_session['problem_beskrivning'].replace('\n', '<br/>'), styles['Brödtext']))
+                elements.append(Paragraph("VALDA PERSPEKTIV:", styles['Mellanrubrik']))
+                elements.append(Paragraph(str(current_session.get('steg2_selected_perspectives', 'Ej dokumenterat')).replace('\n', '<br/>'), styles['Brödtext']))
+                elements.append(Paragraph("SLUTSATSER:", styles['Mellanrubrik']))
+                elements.append(Paragraph(str(current_session.get('steg3_conclusions', 'Ej dokumenterat')).replace('\n', '<br/>'), styles['Brödtext']))
+                elements.append(Paragraph("HANDLINGSPLAN:", styles['Mellanrubrik']))
+                elements.append(Paragraph(current_session['steg4_handlingsplan'].replace('\n', '<br/>'), styles['Brödtext']))
+                doc.build(elements)
+                buffer.seek(0)
+                return buffer.read()
+
+            st.download_button(
+                label="📄 Ladda ner som PDF",
+                data=create_pdf(),
+                file_name=f"handlingsplan_{current_session['session_name'].replace(' ', '_')}_{datetime.now().strftime('%Y%m%d')}.pdf",
+                mime="application/pdf"
+            )
         
         with col2:
             if st.button("📝 Redigera handlingsplan"):
