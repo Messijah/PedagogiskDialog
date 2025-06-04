@@ -228,160 +228,164 @@ def record_audio_streamlit(session_id, step_number, key_prefix=""):
 
 def record_and_transcribe_audio(session_id, step_number, key_prefix=""):
     """
-    Ljudinspelning för Streamlit Cloud - fokuserar på filuppladdning.
+    Ljudinspelning med Streamlits inbyggda st.audio_input.
     Returnerar tuple: (audio_file_path, transcription_text)
     """
     st.write("🎤 **Ljudinspelning:**")
     
-    # Kontrollera om vi kör på Streamlit Cloud
-    is_cloud = True
+    # Försök använda Streamlits inbyggda audio_input först
     try:
-        # Försök detektera Streamlit Cloud
-        import os
-        if "STREAMLIT_SHARING" in os.environ or "streamlit.io" in str(st.get_option("server.baseUrlPath", "")):
-            is_cloud = True
-        else:
-            is_cloud = False
-    except:
-        is_cloud = True  # Anta cloud om vi inte kan detektera
-    
-    if is_cloud:
-        # På Streamlit Cloud - visa bara instruktioner för filuppladdning
-        st.warning("⚠️ Direktinspelning fungerar inte på Streamlit Cloud.")
-        st.info("""
-        **Så här spelar du in ljud:**
+        component_key = f"{key_prefix}_audio_input_{session_id}_{step_number}"
         
-        📱 **På telefon:**
-        1. Öppna röstmemo-appen
-        2. Spela in ditt samtal/meddelande
-        3. Spara som ljudfil
-        4. Ladda upp filen ovan
+        # Använd Streamlits inbyggda ljudinspelning
+        audio_bytes = st.audio_input("Spela in ljud", key=component_key)
         
-        💻 **På dator:**
-        1. Använd Windows Ljudinspelare eller Mac Voice Memos
-        2. Spela in ditt samtal/meddelande
-        3. Spara som .wav eller .mp3
-        4. Ladda upp filen ovan
-        
-        🎙️ **För bästa kvalitet:**
-        - Spela in i tyst miljö
-        - Håll mikrofonen nära
-        - Prata tydligt
-        """)
-        return None, None
-    
-    # Lokal utveckling - försök WebRTC
-    try:
-        from streamlit_webrtc import webrtc_streamer, WebRtcMode, RTCConfiguration
-        import av
-        import numpy as np
-        import io
-        import wave
-        
-        # WebRTC konfiguration
-        rtc_configuration = RTCConfiguration({
-            "iceServers": [{"urls": ["stun:stun.l.google.com:19302"]}]
-        })
-        
-        component_key = f"{key_prefix}_webrtc_{session_id}_{step_number}"
-        
-        # Skapa en container för ljuddata
-        if f"audio_frames_{component_key}" not in st.session_state:
-            st.session_state[f"audio_frames_{component_key}"] = []
-        
-        # Skapa state för att hålla koll på om vi redan har processat denna inspelning
-        processed_key = f"processed_{component_key}"
-        if processed_key not in st.session_state:
-            st.session_state[processed_key] = False
-        
-        def audio_frame_callback(frame):
-            """Callback för att samla ljudframes"""
-            audio_array = frame.to_ndarray()
-            st.session_state[f"audio_frames_{component_key}"].append(audio_array)
-            return frame
-        
-        # WebRTC streamer för ljudinspelning
-        webrtc_ctx = webrtc_streamer(
-            key=component_key,
-            mode=WebRtcMode.SENDONLY,
-            audio_frame_callback=audio_frame_callback,
-            rtc_configuration=rtc_configuration,
-            media_stream_constraints={"video": False, "audio": True},
-            async_processing=True,
-        )
-        
-        if webrtc_ctx.state.playing:
-            st.info("🔴 Spelar in... Klicka 'STOP' när du är klar")
-            # Reset processed state när vi börjar en ny inspelning
-            st.session_state[processed_key] = False
+        if audio_bytes is not None:
+            st.success("✅ Ljudinspelning mottagen!")
+            st.audio(audio_bytes, format="audio/wav")
             
-        elif not webrtc_ctx.state.playing and len(st.session_state[f"audio_frames_{component_key}"]) > 0 and not st.session_state[processed_key]:
-            # Konvertera frames till WAV-bytes
-            audio_frames = st.session_state[f"audio_frames_{component_key}"]
-            if audio_frames:
-                with st.spinner("Bearbetar ljudinspelning..."):
-                    # Kombinera alla frames
-                    audio_data = np.concatenate(audio_frames, axis=0)
-                    
-                    # Konvertera till WAV-format
-                    sample_rate = 48000  # WebRTC standard
-                    audio_bytes_io = io.BytesIO()
-                    
-                    with wave.open(audio_bytes_io, 'wb') as wav_file:
-                        wav_file.setnchannels(1)  # Mono
-                        wav_file.setsampwidth(2)  # 16-bit
-                        wav_file.setframerate(sample_rate)
-                        
-                        # Konvertera float till int16
-                        audio_int16 = (audio_data * 32767).astype(np.int16)
-                        wav_file.writeframes(audio_int16.tobytes())
-                    
-                    audio_bytes = audio_bytes_io.getvalue()
+            # Spara ljudfilen automatiskt
+            with st.spinner("Sparar ljudfil..."):
+                audio_file_path = save_recorded_audio(audio_bytes.getvalue(), session_id, step_number)
+            
+            if audio_file_path:
+                st.success(f"💾 Ljudfil sparad: {os.path.basename(audio_file_path)}")
                 
-                st.success("✅ Ljudinspelning klar!")
-                st.audio(audio_bytes, format="audio/wav")
+                # Transkribera automatiskt
+                with st.spinner("Transkriberar ljud med OpenAI Whisper..."):
+                    transcription = transcribe_audio_openai(audio_file_path)
                 
-                # Spara ljudfilen automatiskt
-                with st.spinner("Sparar ljudfil..."):
-                    audio_file_path = save_recorded_audio(audio_bytes, session_id, step_number)
-                
-                if audio_file_path:
-                    st.success(f"💾 Ljudfil sparad: {os.path.basename(audio_file_path)}")
+                if transcription:
+                    st.success("✅ Transkribering klar!")
+                    st.markdown("### 📝 Transkribering:")
+                    st.write(transcription)
                     
-                    # Transkribera automatiskt
-                    with st.spinner("Transkriberar ljud med OpenAI Whisper..."):
-                        transcription = transcribe_audio_openai(audio_file_path)
-                    
-                    if transcription:
-                        st.success("✅ Transkribering klar!")
-                        st.markdown("### 📝 Transkribering:")
-                        st.write(transcription)
-                        
-                        # Markera som processat
-                        st.session_state[processed_key] = True
-                        
-                        # Rensa frames för nästa inspelning
-                        st.session_state[f"audio_frames_{component_key}"] = []
-                        
-                        return audio_file_path, transcription
-                    else:
-                        st.error("❌ Transkribering misslyckades")
-                        return audio_file_path, None
+                    return audio_file_path, transcription
                 else:
-                    st.error("❌ Kunde inte spara ljudfil")
-                    return None, None
+                    st.error("❌ Transkribering misslyckades")
+                    return audio_file_path, None
+            else:
+                st.error("❌ Kunde inte spara ljudfil")
+                return None, None
         else:
-            st.info("Klicka på 'START' för att börja spela in ljud")
-            
-        return None, None
+            st.info("Klicka på mikrofon-ikonen ovan för att spela in ljud")
+            return None, None
             
     except Exception as e:
-        # Fallback för lokal utveckling
-        st.warning("⚠️ WebRTC-inspelning inte tillgänglig.")
-        st.info("""
-        **Alternativ för ljudinspelning:**
-        1. Använd din telefon eller dator för att spela in ljud
-        2. Spara filen som .wav eller .mp3
-        3. Ladda upp filen med filuppladdaren ovan
-        """)
-        return None, None
+        # Fallback till WebRTC för lokal utveckling
+        st.warning("⚠️ Inbyggd ljudinspelning inte tillgänglig. Försöker WebRTC...")
+        
+        try:
+            from streamlit_webrtc import webrtc_streamer, WebRtcMode, RTCConfiguration
+            import av
+            import numpy as np
+            import io
+            import wave
+            
+            # WebRTC konfiguration
+            rtc_configuration = RTCConfiguration({
+                "iceServers": [{"urls": ["stun:stun.l.google.com:19302"]}]
+            })
+            
+            component_key = f"{key_prefix}_webrtc_{session_id}_{step_number}"
+            
+            # Skapa en container för ljuddata
+            if f"audio_frames_{component_key}" not in st.session_state:
+                st.session_state[f"audio_frames_{component_key}"] = []
+            
+            # Skapa state för att hålla koll på om vi redan har processat denna inspelning
+            processed_key = f"processed_{component_key}"
+            if processed_key not in st.session_state:
+                st.session_state[processed_key] = False
+            
+            def audio_frame_callback(frame):
+                """Callback för att samla ljudframes"""
+                audio_array = frame.to_ndarray()
+                st.session_state[f"audio_frames_{component_key}"].append(audio_array)
+                return frame
+            
+            # WebRTC streamer för ljudinspelning
+            webrtc_ctx = webrtc_streamer(
+                key=component_key,
+                mode=WebRtcMode.SENDONLY,
+                audio_frame_callback=audio_frame_callback,
+                rtc_configuration=rtc_configuration,
+                media_stream_constraints={"video": False, "audio": True},
+                async_processing=True,
+            )
+            
+            if webrtc_ctx.state.playing:
+                st.info("🔴 Spelar in... Klicka 'STOP' när du är klar")
+                # Reset processed state när vi börjar en ny inspelning
+                st.session_state[processed_key] = False
+                
+            elif not webrtc_ctx.state.playing and len(st.session_state[f"audio_frames_{component_key}"]) > 0 and not st.session_state[processed_key]:
+                # Konvertera frames till WAV-bytes
+                audio_frames = st.session_state[f"audio_frames_{component_key}"]
+                if audio_frames:
+                    with st.spinner("Bearbetar ljudinspelning..."):
+                        # Kombinera alla frames
+                        audio_data = np.concatenate(audio_frames, axis=0)
+                        
+                        # Konvertera till WAV-format
+                        sample_rate = 48000  # WebRTC standard
+                        audio_bytes_io = io.BytesIO()
+                        
+                        with wave.open(audio_bytes_io, 'wb') as wav_file:
+                            wav_file.setnchannels(1)  # Mono
+                            wav_file.setsampwidth(2)  # 16-bit
+                            wav_file.setframerate(sample_rate)
+                            
+                            # Konvertera float till int16
+                            audio_int16 = (audio_data * 32767).astype(np.int16)
+                            wav_file.writeframes(audio_int16.tobytes())
+                        
+                        audio_bytes = audio_bytes_io.getvalue()
+                    
+                    st.success("✅ Ljudinspelning klar!")
+                    st.audio(audio_bytes, format="audio/wav")
+                    
+                    # Spara ljudfilen automatiskt
+                    with st.spinner("Sparar ljudfil..."):
+                        audio_file_path = save_recorded_audio(audio_bytes, session_id, step_number)
+                    
+                    if audio_file_path:
+                        st.success(f"💾 Ljudfil sparad: {os.path.basename(audio_file_path)}")
+                        
+                        # Transkribera automatiskt
+                        with st.spinner("Transkriberar ljud med OpenAI Whisper..."):
+                            transcription = transcribe_audio_openai(audio_file_path)
+                        
+                        if transcription:
+                            st.success("✅ Transkribering klar!")
+                            st.markdown("### 📝 Transkribering:")
+                            st.write(transcription)
+                            
+                            # Markera som processat
+                            st.session_state[processed_key] = True
+                            
+                            # Rensa frames för nästa inspelning
+                            st.session_state[f"audio_frames_{component_key}"] = []
+                            
+                            return audio_file_path, transcription
+                        else:
+                            st.error("❌ Transkribering misslyckades")
+                            return audio_file_path, None
+                    else:
+                        st.error("❌ Kunde inte spara ljudfil")
+                        return None, None
+            else:
+                st.info("Klicka på 'START' för att börja spela in ljud")
+                
+            return None, None
+                
+        except Exception as e2:
+            # Sista fallback
+            st.error("❌ Ingen ljudinspelningsmetod tillgänglig.")
+            st.info("""
+            **Alternativ för ljudinspelning:**
+            1. Använd din telefon eller dator för att spela in ljud
+            2. Spara filen som .wav eller .mp3
+            3. Ladda upp filen med filuppladdaren ovan
+            """)
+            return None, None
