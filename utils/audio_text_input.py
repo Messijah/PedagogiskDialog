@@ -37,17 +37,32 @@ def audio_text_input(step_number, session_id, key_prefix=""):
             st.success(f"Ljudfil uppladdad: `{audio_path}`")
             display_audio_player(audio_path)
 
-            if st.button("🔊 Transkribera uppladdad fil", key=f"{key_prefix}_trans_up_{step_number}"):
-                with st.spinner("Transkriberar uppladdad fil..."):
-                    transcript = transcribe_audio_openai(audio_path)
-                if transcript:
-                    st.text_area(
-                        "Transkribering:",
-                        value=transcript,
-                        height=200,
-                        key=f"{key_prefix}_auto_trans_{step_number}"
-                    )
-                    return transcript, audio_path
+            # Automatisk transkribering
+            with st.spinner("Transkriberar uppladdad fil automatiskt..."):
+                transcript = transcribe_audio_openai(audio_path)
+            
+            if transcript:
+                st.success("✅ Automatisk transkribering klar!")
+                st.text_area(
+                    "Transkribering:",
+                    value=transcript,
+                    height=200,
+                    key=f"{key_prefix}_auto_trans_{step_number}"
+                )
+                return transcript, audio_path
+            else:
+                st.error("❌ Transkribering misslyckades")
+                if st.button("🔄 Försök igen", key=f"{key_prefix}_retry_{step_number}"):
+                    with st.spinner("Försöker transkribera igen..."):
+                        transcript = transcribe_audio_openai(audio_path)
+                    if transcript:
+                        st.text_area(
+                            "Transkribering:",
+                            value=transcript,
+                            height=200,
+                            key=f"{key_prefix}_retry_trans_{step_number}"
+                        )
+                        return transcript, audio_path
 
     st.markdown("— eller —")
 

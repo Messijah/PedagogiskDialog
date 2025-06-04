@@ -105,22 +105,14 @@ def display_audio_player(audio_file_path):
 
 def record_audio_streamlit(session_id, step_number, key_prefix=""):
     """
-    Spela in ljud med komponenten streamlit-audiorec.
-    Returnerar inspelade audio_bytes (WAV) eller None.
+    Placeholder för ljudinspelning - använd filuppladdning istället.
     """
-    try:
-        from streamlit_audiorec import st_audiorec
-    except ImportError:
-        st.error("streamlit_audiorec saknas. Kontrollera att du har 'streamlit-audiorec @ git+https://github.com/stefanrmmr/streamlit-audio-recorder.git' i requirements.txt och redeployat.")
-        return None
-
-    st.write("🎤 **Klicka på knappen nedan för att spela in ljud:**")
-    component_key = f"{key_prefix}_recorder_{session_id}_{step_number}"
-    
-    audio_bytes = st_audiorec()
-    
-    if audio_bytes:
-        # Spela upp direkt i UI
-        st.audio(audio_bytes, format="audio/wav")
-        return audio_bytes
+    st.warning("⚠️ Direktinspelning är inte tillgänglig i denna miljö.")
+    st.info("""
+    **Använd istället:**
+    1. Spela in ljud med din telefon eller dator
+    2. Spara som .wav eller .mp3 fil
+    3. Ladda upp filen med "Browse files" ovan
+    4. Klicka "Transkribera uppladdad fil"
+    """)
     return None
