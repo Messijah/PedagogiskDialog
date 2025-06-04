@@ -2,10 +2,10 @@ streamlit>=1.28.0
 openai>=1.0.0
 pandas>=2.0.0
 pydub>=0.25.1
-# Audio recording component - using working version from GitHub
-streamlit-audiorec @ git+https://github.com/stefanrmmr/streamlit-audio-recorder.git
+# Audio recording component - using streamlit-webrtc for better browser compatibility
+streamlit-webrtc>=0.62.0
 python-dotenv>=1.0.0
+numpy>=1.21.0
 
-# För direktinspelning av ljud i webbläsaren:
-# Om pip-installation inte fungerar, använd:
-# pip install git+https://github.com/stefanrmmr/streamlit_audio_recorder
+# För direktinspelning av ljud i webbläsaren med WebRTC
+# streamlit-webrtc ger bättre kompatibilitet än streamlit-audiorec
