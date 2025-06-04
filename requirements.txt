@@ -5,3 +5,8 @@ plotly>=5.15.0
 python-docx>=0.8.11
 reportlab>=4.0.0
 python-dotenv>=1.0.0
+streamlit-audio-recorder>=0.0.8
+
+# För direktinspelning av ljud i webbläsaren:
+# Om pip-installation inte fungerar, använd:
+# pip install git+https://github.com/stefanrmmr/streamlit_audio_recorder
