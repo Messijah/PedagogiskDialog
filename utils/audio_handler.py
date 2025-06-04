@@ -39,6 +39,26 @@ def save_recorded_audio(audio_bytes: bytes, session_id, step_number):
     
     return filepath
 
+def transcribe_uploaded_file(uploaded_file, session_id, step_number):
+    """
+    Spara och transkribera en uppladdad ljudfil.
+    Returnerar tuple: (transcription_text, audio_file_path)
+    """
+    try:
+        # Spara filen först
+        audio_path = save_uploaded_audio(uploaded_file, session_id, step_number)
+        
+        if audio_path:
+            # Transkribera filen
+            transcription = transcribe_audio_openai(audio_path)
+            return transcription, audio_path
+        else:
+            return None, None
+            
+    except Exception as e:
+        st.error(f"Fel vid hantering av uppladdad fil: {e}")
+        return None, None
+
 def transcribe_audio_openai(audio_file_path):
     """
     Transkribera en sparad ljudfil med OpenAI Whisper-API.

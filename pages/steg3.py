@@ -3,7 +3,7 @@ import json
 from utils.session_manager import get_current_session, is_step_accessible
 from utils.ai_helper import analyze_discussion_steg3
 from utils.database import update_session_step3
-from utils.audio_handler import transcribe_uploaded_file, validate_audio_file, record_audio_streamlit, save_recorded_audio, transcribe_audio_openai
+from utils.audio_handler import transcribe_uploaded_file, validate_audio_file, save_recorded_audio, transcribe_audio_openai
 from utils.audio_text_input import audio_text_input
 
 # Konfigurera sida

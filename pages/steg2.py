@@ -2,7 +2,7 @@ import streamlit as st
 from utils.session_manager import get_current_session, is_step_accessible
 from utils.ai_helper import analyze_perspectives_steg2
 from utils.database import update_session_step2
-from utils.audio_handler import transcribe_uploaded_file, validate_audio_file, display_audio_player, record_audio_streamlit, save_recorded_audio, transcribe_audio_openai
+from utils.audio_handler import validate_audio_file, display_audio_player, save_recorded_audio, transcribe_audio_openai
 from utils.audio_text_input import audio_text_input
 
 # Konfigurera sida
