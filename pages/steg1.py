@@ -123,7 +123,6 @@ AI:n kommer sedan att hjälpa dig att strukturera hur du bäst presenterar detta
 """)
 
 with st.form("problem_form"):
-    # --- Uppladdning av transkribering (ljud eller text) ---
     st.markdown("---")
     st.subheader("📤 Ladda upp transkribering (valfritt)")
     col1, col2 = st.columns(2)
@@ -131,57 +130,25 @@ with st.form("problem_form"):
         uploaded_audio = st.file_uploader(
             "Ladda upp ljudfil för transkribering (WAV/MP3/M4A/MP4)",
             type=["wav", "mp3", "m4a", "mp4"],
-            key="audio_upload_steg1"
+            key="audio_upload_steg1_form"
         )
-        if uploaded_audio:
-            from utils.audio_handler import transcribe_uploaded_file, validate_audio_file
-            is_valid, message = validate_audio_file(uploaded_audio)
-            if is_valid:
-                st.success(f"✅ Fil uppladdad: {uploaded_audio.name}")
-                if st.form_submit_button("🔤 Transkribera ljudfil", key="transcribe_audio_steg1"):
-                    with st.spinner("Transkriberar ljudfil... Detta kan ta några minuter."):
-                        transcript, audio_path = transcribe_uploaded_file(
-                            uploaded_audio, current_session['id'], 1
-                        )
-                        if transcript:
-                            st.session_state.transcript_steg1 = transcript
-                            st.success("✅ Transkribering klar!")
-                            st.experimental_rerun()
-                        else:
-                            st.error("Kunde inte transkribera filen. Kontrollera att det är en giltig ljudfil.")
-            else:
-                st.error(f"❌ {message}")
     with col2:
         uploaded_text = st.file_uploader(
             "Ladda upp färdig transkribering (TXT)",
             type=["txt"],
-            key="text_upload_steg1"
+            key="text_upload_steg1_form"
         )
-        if uploaded_text:
-            transcript_text = uploaded_text.read().decode("utf-8")
-            st.session_state.transcript_steg1 = transcript_text
-            st.success("✅ Texttranskribering uppladdad!")
-            st.experimental_rerun()
-    # Visa transkribering om den finns
+    # Visa uppladdad/redigerad transkribering i textfält om den finns
     transcript = st.session_state.get('transcript_steg1', '')
-    if transcript:
-        st.markdown("---")
-        st.subheader("📝 Transkribering (Steg 1)")
-        edited_transcript = st.text_area(
-            "Granska och redigera transkriberingen om nödvändigt:",
-            value=transcript,
-            height=300,
-            help="Du kan redigera transkriberingen för att korrigera eventuella fel"
-        )
-        if edited_transcript != transcript:
-            st.session_state.transcript_steg1 = edited_transcript
-            transcript = edited_transcript
+    if uploaded_text:
+        transcript_text = uploaded_text.read().decode("utf-8")
+        transcript = transcript_text
     # Problem beskrivning
     problem_beskrivning = st.text_area(
-        "Problembeskrivning *",
-        value=current_session.get('problem_beskrivning', ''),
+        "Problembeskrivning * (eller lämna tomt och ladda upp transkribering)",
+        value=transcript if transcript else current_session.get('problem_beskrivning', ''),
         height=150,
-        help="Beskriv tydligt det problem eller den fråga som ska diskuteras",
+        help="Beskriv tydligt det problem eller den fråga som ska diskuteras eller ladda upp en transkribering",
         placeholder="Exempel: Vi behöver diskutera hur vi kan förbättra elevernas digitala kompetens..."
     )
     # Personalgrupp
@@ -205,9 +172,28 @@ with st.form("problem_form"):
 # Hantera formulärinlämning
 if submit_button:
     pb = problem_beskrivning.strip()
-    transcript = st.session_state.get('transcript_steg1', '').strip()
-    if not pb and transcript:
-        pb = transcript
+    # Om ljudfil är uppladdad, transkribera den nu
+    uploaded_audio = st.session_state.get('audio_upload_steg1_form')
+    if uploaded_audio:
+        from utils.audio_handler import transcribe_uploaded_file, validate_audio_file
+        is_valid, message = validate_audio_file(uploaded_audio)
+        if is_valid:
+            with st.spinner("Transkriberar ljudfil... Detta kan ta några minuter."):
+                transcript, audio_path = transcribe_uploaded_file(
+                    uploaded_audio, current_session['id'], 1
+                )
+                if transcript:
+                    pb = transcript.strip()
+                    st.session_state.transcript_steg1 = pb
+                else:
+                    st.error("Kunde inte transkribera filen. Kontrollera att det är en giltig ljudfil.")
+                    st.stop()
+        else:
+            st.error(f"❌ {message}")
+            st.stop()
+    # Om problembeskrivning är tom, men transkribering finns, använd transkriberingen
+    if not pb:
+        pb = st.session_state.get('transcript_steg1', '').strip()
     if not pb:
         st.error("Du måste antingen beskriva problemet eller ladda upp en transkribering innan du kan få AI-förslag.")
     else:
