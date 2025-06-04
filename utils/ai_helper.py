@@ -1,4 +1,4 @@
-import openai
+from openai import OpenAI
 import streamlit as st
 import os
 from dotenv import load_dotenv
@@ -7,8 +7,8 @@ import math
 # Ladda miljövariabler
 load_dotenv()
 
-# Konfigurera OpenAI
-openai.api_key = os.getenv('OPENAI_API_KEY')
+# Konfigurera OpenAI client
+client = OpenAI(api_key=os.getenv('OPENAI_API_KEY'))
 
 # AI Prompts
 STEG1_PROMPT = """
@@ -145,7 +145,7 @@ def analyze_long_text(prompt_template, **kwargs):
 def get_ai_response(prompt, max_tokens=2000):
     """Hämta AI-svar från OpenAI"""
     try:
-        response = openai.chat.completions.create(
+        response = client.chat.completions.create(
             model="gpt-4",
             messages=[
                 {"role": "system", "content": "Du är en expert på pedagogisk ledning i svenska skolor."},

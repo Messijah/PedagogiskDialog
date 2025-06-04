@@ -111,70 +111,30 @@ def display_audio_player(audio_file_path):
 
 def record_audio_streamlit(session_id, step_number, key_prefix=""):
     """
-    Spela in ljud med Streamlit WebRTC-komponenten.
+    Spela in ljud med Streamlit Audio Recorder-komponenten.
     Returnerar inspelade ljudet som bytes, annars None.
     """
     st.write("🎤 **Ljudinspelning:**")
     
     try:
-        from streamlit_webrtc import webrtc_streamer, WebRtcMode
-        import av
-        import threading
-        import queue
+        from streamlit_audiorec import st_audiorec
         
-        # Global variabel för att lagra ljuddata
-        audio_frames = queue.Queue()
+        component_key = f"{key_prefix}_audiorec_{session_id}_{step_number}"
         
-        def audio_frame_callback(frame):
-            audio_frames.put(frame)
+        # Använd st_audiorec för ljudinspelning
+        audio_bytes = st_audiorec()
         
-        component_key = f"{key_prefix}_webrtc_{session_id}_{step_number}"
-        
-        webrtc_ctx = webrtc_streamer(
-            key=component_key,
-            mode=WebRtcMode.SENDONLY,
-            audio_frame_callback=audio_frame_callback,
-            media_stream_constraints={"video": False, "audio": True},
-            rtc_configuration={"iceServers": [{"urls": ["stun:stun.l.google.com:19302"]}]}
-        )
-        
-        if webrtc_ctx.audio_receiver:
-            st.info("🎙️ Ljudinspelning är aktiv. Klicka på 'Stop' för att avsluta.")
+        if audio_bytes is not None:
+            st.success("✅ Ljudinspelning klar!")
+            st.audio(audio_bytes, format="audio/wav")
+            return audio_bytes
+        else:
+            st.info("Klicka på mikrofon-knappen för att spela in ljud")
+            return None
             
-            if st.button("💾 Spara inspelning", key=f"{key_prefix}_save_{session_id}_{step_number}"):
-                # Samla ihop ljudframes
-                frames = []
-                while not audio_frames.empty():
-                    frame = audio_frames.get()
-                    frames.append(frame)
-                
-                if frames:
-                    # Konvertera till bytes
-                    import io
-                    import wave
-                    
-                    # Skapa WAV-fil i minnet
-                    wav_buffer = io.BytesIO()
-                    with wave.open(wav_buffer, 'wb') as wav_file:
-                        wav_file.setnchannels(1)  # Mono
-                        wav_file.setsampwidth(2)  # 16-bit
-                        wav_file.setframerate(16000)  # 16kHz
-                        
-                        for frame in frames:
-                            wav_file.writeframes(frame.to_ndarray().tobytes())
-                    
-                    audio_bytes = wav_buffer.getvalue()
-                    st.success("✅ Ljudinspelning sparad!")
-                    st.audio(audio_bytes, format="audio/wav")
-                    return audio_bytes
-                else:
-                    st.warning("Ingen ljuddata hittades. Försök spela in igen.")
-        
-        return None
-        
     except ImportError:
         # Fallback: Visa instruktioner för manuell uppladdning
-        st.warning("⚠️ WebRTC-ljudinspelning är inte tillgänglig.")
+        st.warning("⚠️ Ljudinspelningskomponenten är inte tillgänglig.")
         st.info("""
         **Alternativ för ljudinspelning:**
         1. Använd din telefon eller dator för att spela in ljud
