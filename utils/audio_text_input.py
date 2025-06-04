@@ -80,8 +80,11 @@ def audio_text_input(steg_nummer, session_id, key_prefix=""):
             height=300,
             key=f"{key_prefix}_manual_transcript_{steg_nummer}"
         )
-        if manual_transcript.strip():
+        if st.button("💾 Spara transkribering", key=f"{key_prefix}_save_manual_transcript_{steg_nummer}"):
             st.session_state[f"{key_prefix}_manual_transcript_{steg_nummer}"] = manual_transcript
+            st.session_state.transcript_steg2 = manual_transcript if steg_nummer == 2 else st.session_state.get('transcript_steg2', None)
+            st.session_state.transcript_steg3 = manual_transcript if steg_nummer == 3 else st.session_state.get('transcript_steg3', None)
+            st.session_state.transcript_steg4 = manual_transcript if steg_nummer == 4 else st.session_state.get('transcript_steg4', None)
             st.success("Transkribering sparad!")
             return manual_transcript, None
 
