@@ -73,36 +73,18 @@ if current_session['steg1_approved']:
 st.subheader("Beskriv problemet eller frågan")
 st.markdown("""
 Börja med att tydligt beskriva det problem eller den fråga som du vill diskutera med din personalgrupp. 
-AI:n kommer sedan att hjälpa dig att strukturera hur du bäst presenterar detta för gruppen.
+Du kan ladda upp eller klistra in samtal högst upp på sidan om du vill använda en transkribering.
 """)
 
 with st.form("problem_form"):
     st.markdown("---")
-    st.subheader("📤 Ladda upp transkribering (valfritt)")
-    col1, col2 = st.columns(2)
-    with col1:
-        uploaded_audio = st.file_uploader(
-            "Ladda upp ljudfil för transkribering (WAV/MP3/M4A/MP4)",
-            type=["wav", "mp3", "m4a", "mp4"],
-            key="audio_upload_steg1_form"
-        )
-    with col2:
-        uploaded_text = st.file_uploader(
-            "Ladda upp färdig transkribering (TXT)",
-            type=["txt"],
-            key="text_upload_steg1_form"
-        )
-    # Visa uppladdad/redigerad transkribering i textfält om den finns
-    transcript = st.session_state.get('transcript_steg1', '')
-    if uploaded_text:
-        transcript_text = uploaded_text.read().decode("utf-8")
-        transcript = transcript_text
+    # Ta bort uppladdning av ljudfil och textfil här!
     # Problem beskrivning
     problem_beskrivning = st.text_area(
-        "Problembeskrivning * (eller lämna tomt och ladda upp transkribering)",
+        "Problembeskrivning * (eller lämna tomt och ladda upp transkribering högst upp)",
         value=transcript if transcript else current_session.get('problem_beskrivning', ''),
         height=150,
-        help="Beskriv tydligt det problem eller den fråga som ska diskuteras eller ladda upp en transkribering",
+        help="Beskriv tydligt det problem eller den fråga som ska diskuteras eller ladda upp en transkribering högst upp på sidan",
         placeholder="Exempel: Vi behöver diskutera hur vi kan förbättra elevernas digitala kompetens..."
     )
     # Personalgrupp
@@ -117,11 +99,11 @@ with st.form("problem_form"):
         "Ytterligare kontext (valfritt)",
         value=current_session.get('kontext', ''),
         height=100,
-        help="Lägg till relevant bakgrundsinformation som kan hjälpa AI:n att ge bättre förslag",
+        help="Lägg till relevant bakgrundsinformation som kan hjälpa till att ge bättre förslag",
         placeholder="Exempel: Detta är en uppföljning av tidigare diskussioner om... Vi har tidigare provat... Utmaningen är att..."
     )
     # Submit knapp
-    submit_button = st.form_submit_button("🤖 Få AI-förslag", type="primary")
+    submit_button = st.form_submit_button("Få förslag", type="primary")
 
 # Hantera formulärinlämning
 if submit_button:
