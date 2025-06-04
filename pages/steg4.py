@@ -12,6 +12,7 @@ from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer
 from reportlab.lib.enums import TA_LEFT
 from reportlab.lib.units import mm
+import json
 
 # Konfigurera sida
 st.set_page_config(
@@ -126,6 +127,15 @@ HANDLINGSPLAN:
             )
 
             # --- Snygg PDF-export ---
+            def decode_text(text):
+                # Om texten innehåller unicode-escapes, dekoda dem
+                try:
+                    if isinstance(text, str) and ('\\u' in text or '\\n' in text):
+                        text = bytes(text, "utf-8").decode("unicode_escape")
+                except Exception:
+                    pass
+                return text.replace('\n', '<br/>') if isinstance(text, str) else text
+
             def create_pdf():
                 buffer = tempfile.NamedTemporaryFile(delete=False, suffix=".pdf")
                 doc = SimpleDocTemplate(buffer.name, pagesize=A4, rightMargin=30, leftMargin=30, topMargin=30, bottomMargin=30)
@@ -139,13 +149,13 @@ HANDLINGSPLAN:
                 elements.append(Paragraph(f"Datum: {datetime.now().strftime('%Y-%m-%d')}", styles['Brödtext']))
                 elements.append(Spacer(1, 8*mm))
                 elements.append(Paragraph("PROBLEMFORMULERING:", styles['Mellanrubrik']))
-                elements.append(Paragraph(current_session['problem_beskrivning'].replace('\n', '<br/>'), styles['Brödtext']))
+                elements.append(Paragraph(decode_text(current_session['problem_beskrivning']), styles['Brödtext']))
                 elements.append(Paragraph("VALDA PERSPEKTIV:", styles['Mellanrubrik']))
-                elements.append(Paragraph(str(current_session.get('steg2_selected_perspectives', 'Ej dokumenterat')).replace('\n', '<br/>'), styles['Brödtext']))
+                elements.append(Paragraph(decode_text(current_session.get('steg2_selected_perspectives', 'Ej dokumenterat')), styles['Brödtext']))
                 elements.append(Paragraph("SLUTSATSER:", styles['Mellanrubrik']))
-                elements.append(Paragraph(str(current_session.get('steg3_conclusions', 'Ej dokumenterat')).replace('\n', '<br/>'), styles['Brödtext']))
+                elements.append(Paragraph(decode_text(current_session.get('steg3_conclusions', 'Ej dokumenterat')), styles['Brödtext']))
                 elements.append(Paragraph("HANDLINGSPLAN:", styles['Mellanrubrik']))
-                elements.append(Paragraph(current_session['steg4_handlingsplan'].replace('\n', '<br/>'), styles['Brödtext']))
+                elements.append(Paragraph(decode_text(current_session['steg4_handlingsplan']), styles['Brödtext']))
                 doc.build(elements)
                 buffer.seek(0)
                 return buffer.read()
