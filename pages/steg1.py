@@ -107,7 +107,7 @@ with st.form("problem_form"):
 
 # Hantera formulärinlämning
 if submit_button:
-    pb = problem_beskrivning.strip()
+    pb = (problem_beskrivning or "").strip()
     # Om ljudfil är uppladdad, transkribera den nu
     uploaded_audio = st.session_state.get('audio_upload_steg1_form')
     if uploaded_audio:
