@@ -9,3 +9,5 @@ python-dotenv>=1.0.0
 # För direktinspelning av ljud i webbläsaren:
 # Om pip-installation inte fungerar, använd:
 # pip install git+https://github.com/stefanrmmr/streamlit_audio_recorder
+
+git+https://github.com/stefanrmmr/streamlit_audio_recorder
