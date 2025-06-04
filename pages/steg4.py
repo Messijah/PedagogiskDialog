@@ -342,4 +342,4 @@ if current_session.get('completed'):
 
 # Footer
 st.markdown("---")
-st.caption("Steg 4 av 4 | Samtalsmodell för rektorer")
+st.caption("Steg 4 av 4")

@@ -212,4 +212,4 @@ with st.expander("Tips för en bra problembeskrivning"):
 
 # Footer
 st.markdown("---")
-st.caption("Steg 1 av 4 | Samtalsmodell för rektorer")
+st.caption("Steg 1 av 4")
