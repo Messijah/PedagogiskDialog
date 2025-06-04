@@ -11,160 +11,71 @@ openai.api_key = os.getenv('OPENAI_API_KEY')
 
 # AI Prompts
 STEG1_PROMPT = """
-Du är en expert på pedagogisk ledning i svenska skolor med lång erfarenhet av att leda personalgrupper.
+Du är en samtalscoach för rektorer i svensk skola och expert på att leda professionella samtal enligt LPGD-modellen.
 
-UPPGIFT: Analysera följande problem och ge strukturerade förslag för hur rektor ska presentera det för personalgruppen.
+UPPGIFT: Utifrån följande beskrivning av ett problem eller en fråga, ge ett förslag på hur rektorn kan presentera detta för sin personalgrupp på ett sätt som:
+- Tydligt definierar syftet och målet med samtalet (Sätt scenen)
+- Kopplar till skolans mål/vision
+- Skapar trygghet och engagemang
+- Lägger grunden för en öppen och lösningsfokuserad dialog
 
-PROBLEM: {problem_beskrivning}
+PROBLEM/FRÅGA: {problem_beskrivning}
 PERSONALGRUPP: {personal_grupp}
 KONTEXT: {kontext}
 
-GE FÖRSLAG PÅ:
-
-## 1. Presentation av problemet
-- Hur problemet bäst introduceras
-- Vilken ton och approach som är lämplig
-- Hur man skapar öppenhet för diskussion
-
-## 2. Diskussionsfrågor
-- 3-5 öppna frågor som uppmuntrar olika perspektiv
-- Följdfrågor för att fördjupa diskussionen
-- Frågor som hjälper gruppen att fokusera
-
-## 3. Mötesstruktur
-- Förslag på tidsram
-- Hur diskussionen kan struktureras
-- Roller och ansvar under mötet
-
-## 4. Potentiella utmaningar
-- Vad som kan bli problematiskt
-- Hur man hanterar motstånd eller konflikt
-- Sätt att hålla diskussionen konstruktiv
+Ge ett konkret förslag på inledning och struktur för samtalet, inklusive:
+1. Hur rektorn kan sätta scenen
+2. Exempel på öppningsfraser
+3. Hur samtalet kan kopplas till skolans mål/vision
+4. Hur trygghet och engagemang kan skapas
+5. Förslag på 2-3 öppna frågor som bjuder in olika perspektiv
 
 Svara på svenska i tydligt strukturerat format med markdown.
 """
 
 STEG2_PROMPT = """
-Du är en expert på att analysera gruppsamtal och identifiera olika perspektiv i pedagogiska diskussioner.
+Du är en samtalscoach för rektorer. Här är en transkribering från ett samtal där olika perspektiv på ett problem har diskuterats.
 
-UPPGIFT: Analysera denna transkribering från personalgruppens diskussion och identifiera olika perspektiv.
+UPPGIFT: Sammanfatta och strukturera de olika perspektiv, argument och synsätt som framkommit enligt LPGD-modellen:
+1. Bjud in olika perspektiv och argument
+2. Identifiera mönster, gemensamma nämnare och skillnader
+3. Lyft fram 2-3 perspektiv som är särskilt viktiga att fördjupa i nästa steg
 
 URSPRUNGLIGT PROBLEM: {problem_beskrivning}
 TRANSKRIBERING: {transcript}
 
-ANALYSERA OCH IDENTIFIERA:
-
-## 1. Huvudperspektiv
-- Lista de olika synsätt som framkommit
-- Gruppera liknande åsikter
-- Identifiera motsättningar
-
-## 2. Återkommande teman
-- Vilka ämnen som diskuteras mest
-- Gemensamma bekymmer eller förslag
-- Underliggande värderingar
-
-## 3. Konfliktområden
-- Där åsikterna går isär
-- Potentiella spänningar
-- Områden som behöver fördjupning
-
-## 4. Förslag för Steg 3
-- Vilka 2-3 perspektiv som bör fördjupas
-- Motivering för varför dessa är viktiga
-- Förslag på hur fördjupningen kan göras
-
-## 5. Sammanfattning
-- Kort sammanfattning av diskussionens huvuddrag
-- Vad som fungerade bra
-- Vad som behöver utvecklas
-
-Svara på svenska i strukturerat format.
+Ge en tydlig och strukturerad sammanfattning som underlag för fördjupad diskussion. Avsluta med rekommendation om vilka perspektiv som bör väljas för fördjupning.
 """
 
 STEG3_PROMPT = """
-Du är en expert på att analysera fördjupade diskussioner och dra konstruktiva slutsatser.
+Du är en samtalscoach för rektorer. Här är en transkribering från en fördjupad diskussion om utvalda perspektiv.
 
-UPPGIFT: Analysera den fördjupade diskussionen och formulera tydliga slutsatser.
+UPPGIFT: Analysera samtalet och dra slutsatser kring:
+- Vilka lösningar, insikter eller åtgärdsförslag har diskuterats?
+- Vilka hinder och möjligheter har identifierats?
+- Vilka slutsatser kan ligga till grund för en konkret handlingsplan?
+
+Följ LPGD-modellen: 1. Fördjupa och strukturera diskussionen, 2. Sammanfatta mönster och insikter, 3. Avsluta med konkreta slutsatser.
 
 URSPRUNGLIGT PROBLEM: {problem_beskrivning}
 VALDA PERSPEKTIV FRÅN STEG 2: {selected_perspectives}
 FÖRDJUPAD DISKUSSION: {transcript}
 
-ANALYSERA OCH DRA SLUTSATSER:
-
-## 1. Konsensus som uppnåtts
-- Vad gruppen är överens om
-- Gemensamma lösningsförslag
-- Delade värderingar och mål
-
-## 2. Kvarvarande meningsskiljaktigheter
-- Områden där åsikterna fortfarande går isär
-- Hur dessa kan hanteras
-- Kompromissmöjligheter
-
-## 3. Konkreta åtgärdsförslag
-- Specifika förslag som framkommit
-- Vem som kan ansvara för vad
-- Resurser som behövs
-
-## 4. Prioriteringar
-- Vad som bör göras först
-- Långsiktiga vs kortsiktiga åtgärder
-- Vad som är mest kritiskt
-
-## 5. Rekommendationer för handlingsplan
-- Huvudområden för handlingsplanen
-- Förslag på struktur
-- Viktiga element att inkludera
-
-Formulera tydliga, handlingsbara slutsatser på svenska.
+Ge en tydlig sammanfattning av slutsatser och möjliga åtgärder.
 """
 
 STEG4_PROMPT = """
-Du är en expert på att skapa strukturerade handlingsplaner för svenska skolor.
+Du är en samtalscoach för rektorer. Här är en sammanfattning/slutsats eller transkribering från ett samtal om åtgärder.
 
-UPPGIFT: Skapa en professionell handlingsplan baserat på diskussionens slutsatser.
+UPPGIFT: Skriv en konkret handlingsplan enligt denna mall:
+- Syfte och mål
+- Viktiga åtgärder och ansvariga
+- Tidsplan och uppföljning
+- Stöd och resurser
 
-URSPRUNGLIGT PROBLEM: {problem_beskrivning}
-SLUTSATSER FRÅN STEG 3: {conclusions}
-ÅTGÄRDSFÖRSLAG: {action_suggestions}
+UNDERLAG: {conclusions}
 
-SKAPA EN HANDLINGSPLAN MED:
-
-## 1. Sammanfattning
-- Kort beskrivning av problemet
-- Huvudsakliga slutsatser från diskussionen
-
-## 2. Mål och syfte
-- Vad som ska uppnås
-- Mätbara resultat
-- Tidsram för måluppfyllelse
-
-## 3. Konkreta åtgärder
-För varje åtgärd, ange:
-- Vad som ska göras (specifikt)
-- Vem som ansvarar
-- När det ska vara klart
-- Resurser som behövs
-- Hur framsteg mäts
-
-## 4. Tidsplan
-- Milstolpar och deadlines
-- Prioritetsordning
-- Beroenden mellan åtgärder
-
-## 5. Uppföljning
-- Hur och när uppföljning sker
-- Vem som ansvarar för uppföljning
-- Kriterier för framgång
-
-## 6. Risker och utmaningar
-- Potentiella hinder
-- Förebyggande åtgärder
-- Alternativa lösningar
-
-Använd professionell ton lämplig för svenska skolor. Formatera som en färdig handlingsplan.
+Skriv handlingsplanen tydligt och strukturerat på svenska.
 """
 
 @st.cache_data(show_spinner=False)
