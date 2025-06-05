@@ -6,6 +6,7 @@ pydub>=0.25.1
 streamlit-webrtc>=0.62.0
 python-dotenv>=1.0.0
 numpy>=1.21.0
+reportlab>=4.0.0
 
 # För direktinspelning av ljud i webbläsaren (endast lokal utveckling)
 # På Streamlit Cloud används filuppladdning istället
