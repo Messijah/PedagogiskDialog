@@ -6,7 +6,7 @@ from utils.ai_helper import validate_api_key
 
 # Konfigurera Streamlit
 st.set_page_config(
-    page_title="Pedagogiskt samtalsstöd",
+    page_title="Start",
     page_icon=None,
     layout="wide",
     initial_sidebar_state="expanded"
@@ -17,7 +17,6 @@ init_session()
 
 # Sidebar för session management
 with st.sidebar:
-    st.title("Pedagogiskt samtalsstöd")
     
     # API Key kontroll
     if not validate_api_key():
