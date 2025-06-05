@@ -17,14 +17,14 @@ st.set_page_config(
 if not is_step_accessible(3):
     st.error("Du måste först slutföra Steg 2 innan du kan komma åt Steg 3.")
     if st.button("← Gå till Steg 2"):
-        st.switch_page("pages/steg 2.py")
+        st.switch_page("pages/steg2.py")
     st.stop()
 
 current_session = get_current_session()
 if not current_session:
     st.error("Ingen aktiv session. Gå tillbaka till startsidan.")
     if st.button("← Tillbaka till start"):
-        st.switch_page("start.py")
+        st.switch_page("main.py")
     st.stop()
 
 # Header
@@ -35,10 +35,10 @@ st.markdown(f"Session: {current_session['session_name']} | Rektor: {current_sess
 col1, col2, col3 = st.columns([1, 1, 3])
 with col1:
     if st.button("← Steg 2"):
-        st.switch_page("pages/steg 2.py")
+        st.switch_page("pages/steg2.py")
 with col2:
     if st.button("🏠 Start"):
-        st.switch_page("start.py")
+        st.switch_page("main.py")
 
 st.markdown("---")
 
@@ -83,11 +83,11 @@ if current_session['steg3_approved']:
     
     with col2:
         if st.button("← Tillbaka till Steg 2"):
-            st.switch_page("pages/steg 2.py")
+            st.switch_page("pages/steg2.py")
     
     with col3:
         if st.button("➡️ Gå till Steg 4"):
-            st.switch_page("pages/steg 4.py")
+            st.switch_page("pages/steg4.py")
     
     # Om inte i redigeringsläge, stoppa här
     if not st.session_state.get('edit_steg3', False):
@@ -214,7 +214,7 @@ if 'analysis_steg3' in st.session_state or current_session.get('steg3_ai_analysi
                         del st.session_state[key]
                 
                 st.success("Steg 3 godkänt! Går till Steg 4...")
-                st.switch_page("pages/steg 4.py")
+                st.switch_page("pages/steg4.py")
     
     with col2:
         if st.button("🔄 Analysera om"):
