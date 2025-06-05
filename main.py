@@ -18,7 +18,6 @@ init_session()
 # Sidebar för session management
 with st.sidebar:
     st.title("Pedagogiskt samtalsstöd")
-    st.markdown("Stöd för strukturerade personalsamtal")
     
     # API Key kontroll
     if not validate_api_key():
@@ -96,7 +95,7 @@ st.title("Pedagogiskt samtalsstöd")
 if not current_session:
     st.info("Skapa eller välj en session i sidopanelen för att komma igång.")
     st.markdown("""
-    Detta verktyg hjälper dig som rektor att leda strukturerade samtal med din personal genom en tydlig 4-stegs process:
+    Detta verktyg hjälper dig som samtalsledare att leda strukturerade samtal genom en tydlig 4-stegs process:
 
     **Steg 1: Problembeskrivning**
     - Definiera problemet eller frågan som ska diskuteras
