@@ -15,8 +15,38 @@ st.set_page_config(
 # Initialisera session
 init_session()
 
+# CSS för att dölja automatisk filnavigation
+st.markdown("""
+<style>
+/* Dölj automatisk navigation från filnamn */
+section[data-testid="stSidebar"] > div:first-child > div:first-child {
+    display: none;
+}
+</style>
+""", unsafe_allow_html=True)
+
 # Sidebar för session management
 with st.sidebar:
+    # Anpassad navigation med knappar
+    st.markdown("### Navigation")
+    
+    # Navigation knappar med mellanrum
+    if st.button("🏠 Start", use_container_width=True, type="primary"):
+        st.switch_page("main.py")
+    
+    if st.button("📝 Steg 1", use_container_width=True):
+        st.switch_page("pages/steg1.py")
+    
+    if st.button("👥 Steg 2", use_container_width=True):
+        st.switch_page("pages/steg2.py")
+    
+    if st.button("💭 Steg 3", use_container_width=True):
+        st.switch_page("pages/steg3.py")
+    
+    if st.button("📋 Steg 4", use_container_width=True):
+        st.switch_page("pages/steg4.py")
+    
+    st.divider()
     
     # API Key kontroll
     if not validate_api_key():
