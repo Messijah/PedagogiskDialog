@@ -25,14 +25,14 @@ st.set_page_config(
 if not is_step_accessible(4):
     st.error("Du måste först slutföra Steg 3 innan du kan komma åt Steg 4.")
     if st.button("← Gå till Steg 3"):
-        st.switch_page("pages/steg3.py")
+        st.switch_page("pages/steg 3.py")
     st.stop()
 
 current_session = get_current_session()
 if not current_session:
     st.error("Ingen aktiv session. Gå tillbaka till startsidan.")
     if st.button("← Tillbaka till start"):
-        st.switch_page("main.py")
+        st.switch_page("start.py")
     st.stop()
 
 # Header
@@ -51,10 +51,10 @@ if transcript:
 col1, col2, col3 = st.columns([1, 1, 3])
 with col1:
     if st.button("← Steg 3"):
-        st.switch_page("pages/steg3.py")
+        st.switch_page("pages/steg 3.py")
 with col2:
     if st.button("🏠 Start"):
-        st.switch_page("main.py")
+        st.switch_page("start.py")
 
 st.markdown("---")
 
@@ -172,7 +172,7 @@ HANDLINGSPLAN:
         
         with col3:
             if st.button("🏠 Tillbaka till start"):
-                st.switch_page("main.py")
+                st.switch_page("start.py")
     
     # Om inte i redigeringsläge, stoppa här
     if not st.session_state.get('edit_steg4', False):
