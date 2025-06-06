@@ -262,7 +262,7 @@ if 'handlingsplan_steg4' in st.session_state or current_session.get('steg4_handl
 {current_session['problem_beskrivning']}
 
 ## Perspektiv som diskuterades
-{current_session.get('steg2_selected_perspectives', 'Ej dokumenterat').replace('\\n', '\n') if current_session.get('steg2_selected_perspectives') else 'Ej dokumenterat'}
+{decode_text(current_session.get('steg2_selected_perspectives', 'Ej dokumenterat')) if current_session.get('steg2_selected_perspectives') else 'Ej dokumenterat'}
 
 ## Slutsatser från diskussion
 {current_session.get('steg3_conclusions', 'Ej dokumenterat')}
