@@ -20,7 +20,7 @@ current_session = get_current_session()
 if not current_session:
     st.error("Inget aktivt samtal. Gå tillbaka till startsidan.")
     if st.button("← Tillbaka till start"):
-        st.switch_page("Start.py")
+        st.switch_page("main.py")
     st.stop()
 
 # Header
@@ -39,7 +39,7 @@ if transcript:
 col1, col2 = st.columns([1, 4])
 with col1:
     if st.button("← Tillbaka"):
-        st.switch_page("Start.py")
+        st.switch_page("main.py")
 
 st.markdown("---")
 
