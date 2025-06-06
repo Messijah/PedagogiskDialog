@@ -17,7 +17,7 @@ st.set_page_config(
 if not is_step_accessible(3):
     st.error("Du måste först slutföra Steg 2 innan du kan komma åt Steg 3.")
     if st.button("← Gå till Steg 2"):
-        st.switch_page("pages/steg2.py")
+        st.switch_page("pages/steg 2.py")
     st.stop()
 
 current_session = get_current_session()
@@ -35,7 +35,7 @@ st.markdown(f"Samtal: {current_session['session_name']} | Samtalsledare: {curren
 col1, col2, col3 = st.columns([1, 1, 3])
 with col1:
     if st.button("← Steg 2"):
-        st.switch_page("pages/steg2.py")
+        st.switch_page("pages/steg 2.py")
 with col2:
     if st.button("🏠 Start"):
         st.switch_page("main.py")
