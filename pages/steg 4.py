@@ -32,7 +32,7 @@ current_session = get_current_session()
 if not current_session:
     st.error("Inget aktivt samtal. Gå tillbaka till startsidan.")
     if st.button("← Tillbaka till start"):
-        st.switch_page("start.py")
+        st.switch_page("main.py")
     st.stop()
 
 # Header
@@ -54,7 +54,7 @@ with col1:
         st.switch_page("pages/steg 3.py")
 with col2:
     if st.button("🏠 Start"):
-        st.switch_page("start.py")
+        st.switch_page("main.py")
 
 st.markdown("---")
 
@@ -172,7 +172,7 @@ HANDLINGSPLAN:
         
         with col3:
             if st.button("🏠 Tillbaka till start"):
-                st.switch_page("start.py")
+                st.switch_page("main.py")
     
     # Om inte i redigeringsläge, stoppa här
     if not st.session_state.get('edit_steg4', False):
