@@ -24,7 +24,7 @@ current_session = get_current_session()
 if not current_session:
     st.error("Inget aktivt samtal. Gå tillbaka till startsidan.")
     if st.button("← Tillbaka till start"):
-        st.switch_page("main.py")
+        st.switch_page("Start.py")
     st.stop()
 
 # Header
@@ -38,7 +38,7 @@ with col1:
         st.switch_page("pages/steg 2.py")
 with col2:
     if st.button("🏠 Start"):
-        st.switch_page("main.py")
+        st.switch_page("Start.py")
 
 st.markdown("---")
 
