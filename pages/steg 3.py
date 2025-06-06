@@ -152,7 +152,7 @@ if 'transcript_steg3' in st.session_state or current_session.get('steg3_transcri
         st.session_state.transcript_steg3 = edited_transcript
     
     # Analysera diskussion
-    if st.button("🤖 Analysera diskussion och dra slutsatser", type="primary"):
+    if st.button("Analysera diskussion och dra slutsatser", type="primary"):
         with st.spinner("AI analyserar den fördjupade diskussionen och drar slutsatser..."):
             analysis = analyze_discussion_steg3(
                 current_session['problem_beskrivning'],

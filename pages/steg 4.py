@@ -109,6 +109,7 @@ if current_session['steg4_approved']:
             plan_text = f"""
 HANDLINGSPLAN - {current_session['session_name']}
 Samtalsledare: {current_session['rektor_name']}
+Deltagare: {current_session.get('participants', 'Ej angivet')}
 Datum: {datetime.now().strftime('%Y-%m-%d')}
 
 PROBLEMFORMULERING:
@@ -151,6 +152,7 @@ HANDLINGSPLAN:
                 elements = []
                 elements.append(Paragraph(f"HANDLINGSPLAN - {current_session['session_name']}", styles['Rubrik']))
                 elements.append(Paragraph(f"Samtalsledare: {current_session['rektor_name']}", styles['Brödtext']))
+                elements.append(Paragraph(f"Deltagare: {current_session.get('participants', 'Ej angivet')}", styles['Brödtext']))
                 elements.append(Paragraph(f"Datum: {datetime.now().strftime('%Y-%m-%d')}", styles['Brödtext']))
                 elements.append(Spacer(1, 8*mm))
                 elements.append(Paragraph("PROBLEMFORMULERING:", styles['Mellanrubrik']))
@@ -253,6 +255,7 @@ if 'handlingsplan_steg4' in st.session_state or current_session.get('steg4_handl
 # HANDLINGSPLAN - {current_session['session_name']}
 
 **Samtalsledare:** {current_session['rektor_name']}
+**Deltagare:** {current_session.get('participants', 'Ej angivet')}
 **Datum:** {datetime.now().strftime('%Y-%m-%d')}
 
 ## Problemformulering
