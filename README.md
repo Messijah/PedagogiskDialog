@@ -1,6 +1,6 @@
-# Samtalsmodell för rektorer
+# Samtalsmodell för samtalsledare
 
-Detta är en applikation som hjälper rektorer att leda strukturerade samtal med sin personal genom en kontrollerad 4-stegs process. Systemet använder OpenAI:s GPT-4 och Whisper för att analysera diskussioner och skapa handlingsplaner.
+Detta är en applikation som hjälper samtalsledare att leda strukturerade samtal med sin personal genom en kontrollerad 4-stegs process. Systemet använder OpenAI:s GPT-4 och Whisper för att analysera diskussioner och skapa handlingsplaner.
 
 ## Funktioner
 
@@ -105,7 +105,7 @@ Applikationen använder SQLite för lokal datalagring. Databasen skapas automati
 
 ## Användning
 
-1. **Skapa en ny session** med sessionens namn och ditt namn som rektor
+1. **Skapa ett nytt samtal** med samtalets namn, ditt namn som samtalsledare och deltagare
 2. **Steg 1**: Beskriv problemet och få förslag för presentation
 3. **Steg 2**: Spela in gruppsamtal och få perspektivanalys
 4. **Steg 3**: Fördjupa diskussionen och få slutsatser
@@ -184,7 +184,7 @@ Detta projekt är licensierat under MIT-licensen. Se LICENSE-filen för detaljer
 
 - OpenAI för GPT-4 och Whisper API
 - Streamlit för ramverket
-- Svenska skolor som inspirerat till denna lösning
+- Svenska organisationer som inspirerat till denna lösning
 
 ## Versionshistorik
 
@@ -197,4 +197,4 @@ Detta projekt är licensierat under MIT-licensen. Se LICENSE-filen för detaljer
 
 ---
 
-Samtalsmodell - Utvecklad för svenska rektorer som vill leda mer strukturerade och produktiva personalsamtal.
+Samtalsmodell - Utvecklad för svenska samtalsledare som vill leda mer strukturerade och produktiva personalsamtal.

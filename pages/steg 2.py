@@ -21,14 +21,14 @@ if not is_step_accessible(2):
 
 current_session = get_current_session()
 if not current_session:
-    st.error("Ingen aktiv session. Gå tillbaka till startsidan.")
+    st.error("Inget aktivt samtal. Gå tillbaka till startsidan.")
     if st.button("← Tillbaka till start"):
         st.switch_page("main.py")
     st.stop()
 
 # Header
 st.title("Steg 2: Perspektivinventering")
-st.markdown(f"Session: {current_session['session_name']} | Rektor: {current_session['rektor_name']}")
+st.markdown(f"Samtal: {current_session['session_name']} | Samtalsledare: {current_session['rektor_name']}")
 
 # === NY INSTRUKTION ===
 st.info("""

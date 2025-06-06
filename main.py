@@ -31,48 +31,51 @@ with st.sidebar:
     
     st.divider()
     
-    # Aktuell session info
+    # Aktuell samtal info
     current_session = get_current_session()
     if current_session:
-        st.subheader("Aktuell Session")
+        st.subheader("Aktuellt Samtal")
         st.write(f"**{current_session['session_name']}**")
-        st.write(f"Rektor: {current_session['rektor_name']}")
+        st.write(f"Samtalsledare: {current_session['rektor_name']}")
+        if current_session.get('participants'):
+            st.write(f"Deltagare: {current_session['participants']}")
         
         # Progress
         progress = get_session_progress()
         st.progress(progress)
         st.caption(f"Framsteg: {int(progress * 100)}%")
         
-        if st.button("🗑️ Avsluta session", type="secondary"):
+        if st.button("🗑️ Avsluta samtal", type="secondary"):
             clear_session()
             st.rerun()
     else:
-        st.info("Ingen aktiv session. Skapa en ny nedan.")
+        st.info("Inget aktivt samtal. Skapa ett nytt nedan.")
     
     st.divider()
     
-    # Session management
-    st.subheader("Sessioner")
+    # Samtal management
+    st.subheader("Samtal")
     
-    # Skapa ny session
-    with st.expander("➕ Skapa ny session"):
+    # Skapa nytt samtal
+    with st.expander("➕ Skapa nytt samtal"):
         with st.form("new_session"):
-            session_name = st.text_input("Sessionens namn", placeholder="t.ex. Digitalisering 2024")
-            rektor_name = st.text_input("Ditt namn", placeholder="Förnamn Efternamn")
+            session_name = st.text_input("Samtalets namn", placeholder="t.ex. Digitalisering 2024")
+            rektor_name = st.text_input("Ditt namn (samtalsledare)", placeholder="Förnamn Efternamn")
+            participants = st.text_area("Deltagare", placeholder="Lista deltagarna, t.ex.:\nAnna Andersson\nPer Persson\nMaria Nilsson", height=100)
             
-            if st.form_submit_button("Skapa session"):
+            if st.form_submit_button("Skapa samtal"):
                 if session_name and rektor_name:
                     from utils.session_manager import create_new_session
-                    session_id = create_new_session(session_name, rektor_name)
-                    st.success(f"Session '{session_name}' skapad!")
+                    session_id = create_new_session(session_name, rektor_name, participants)
+                    st.success(f"Samtal '{session_name}' skapat!")
                     st.rerun()
                 else:
-                    st.error("Fyll i både sessionens namn och ditt namn")
+                    st.error("Fyll i både samtalets namn och ditt namn")
     
-    # Lista befintliga sessioner
+    # Lista befintliga samtal
     sessions = get_all_sessions()
     if sessions:
-        st.write("**Befintliga sessioner:**")
+        st.write("**Befintliga samtal:**")
         for session in sessions[:5]:  # Visa max 5 senaste
             col1, col2 = st.columns([3, 1])
             with col1:
@@ -80,7 +83,7 @@ with st.sidebar:
                 if st.button(f"{status_icon} {session['session_name']}", key=f"load_{session['id']}"):
                     from utils.session_manager import load_session
                     if load_session(session['id']):
-                        st.success(f"Laddade session: {session['session_name']}")
+                        st.success(f"Laddade samtal: {session['session_name']}")
                         st.rerun()
             with col2:
                 if st.button("🗑️", key=f"delete_{session['id']}", help="Ta bort"):
@@ -92,7 +95,7 @@ st.title("Pedagogiskt samtalsstöd")
 
 # Kontrollera om vi har en aktiv session
 if not current_session:
-    st.info("Skapa eller välj en session i sidopanelen för att komma igång.")
+    st.info("Skapa eller välj ett samtal i sidopanelen för att komma igång.")
     st.markdown("""
     Detta verktyg hjälper dig som samtalsledare att leda strukturerade samtal genom en tydlig 4-stegs process:
 
@@ -128,7 +131,7 @@ with col1:
     accessible = is_step_accessible(1)
     if accessible:
         if st.button("Steg 1: Problem", type="primary" if current_session['current_step'] == 1 else "secondary", use_container_width=True):
-            st.switch_page("pages/steg1.py")
+            st.switch_page("pages/steg 1.py")
     else:
         st.button("Steg 1: Problem", disabled=True, use_container_width=True)
     if current_session['steg1_approved']:
@@ -138,7 +141,7 @@ with col2:
     accessible = is_step_accessible(2)
     if accessible:
         if st.button("Steg 2: Perspektiv", type="primary" if current_session['current_step'] == 2 else "secondary", use_container_width=True):
-            st.switch_page("pages/steg2.py")
+            st.switch_page("pages/steg 2.py")
     else:
         st.button("Steg 2: Perspektiv", disabled=True, use_container_width=True)
     if current_session['steg2_approved']:
@@ -148,7 +151,7 @@ with col3:
     accessible = is_step_accessible(3)
     if accessible:
         if st.button("Steg 3: Fördjupning", type="primary" if current_session['current_step'] == 3 else "secondary", use_container_width=True):
-            st.switch_page("pages/steg3.py")
+            st.switch_page("pages/steg 3.py")
     else:
         st.button("Steg 3: Fördjupning", disabled=True, use_container_width=True)
     if current_session['steg3_approved']:
@@ -164,15 +167,17 @@ with col4:
     if current_session['steg4_approved']:
         st.success("Slutfört")
 
-# Visa aktuell session information
+# Visa aktuell samtal information
 st.markdown("---")
-st.subheader("Aktuell Session")
+st.subheader("Aktuellt Samtal")
 
 col1, col2 = st.columns(2)
 with col1:
-    st.write(f"**Session:** {current_session['session_name']}")
-    st.write(f"**Rektor:** {current_session['rektor_name']}")
-    st.write(f"**Skapad:** {current_session['created_at'][:10]}")
+    st.write(f"**Samtal:** {current_session['session_name']}")
+    st.write(f"**Samtalsledare:** {current_session['rektor_name']}")
+    if current_session.get('participants'):
+        st.write(f"**Deltagare:** {current_session['participants']}")
+    st.write(f"**Skapat:** {current_session['created_at'][:10]}")
 
 with col2:
     st.write(f"**Aktuellt steg:** {current_session['current_step']}/4")

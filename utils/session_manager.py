@@ -15,9 +15,9 @@ def init_session():
     if 'session_data' not in st.session_state:
         st.session_state.session_data = None
 
-def create_new_session(session_name, rektor_name):
+def create_new_session(session_name, rektor_name, participants=None):
     """Skapa ny session och sätt som aktiv"""
-    session_id = create_session(session_name, rektor_name)
+    session_id = create_session(session_name, rektor_name, participants)
     st.session_state.session_id = session_id
     st.session_state.current_step = 1
     st.session_state.session_data = get_session(session_id)

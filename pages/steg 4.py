@@ -30,14 +30,14 @@ if not is_step_accessible(4):
 
 current_session = get_current_session()
 if not current_session:
-    st.error("Ingen aktiv session. Gå tillbaka till startsidan.")
+    st.error("Inget aktivt samtal. Gå tillbaka till startsidan.")
     if st.button("← Tillbaka till start"):
         st.switch_page("main.py")
     st.stop()
 
 # Header
 st.title("Steg 4: Handlingsplan")
-st.markdown(f"Session: {current_session['session_name']} | Rektor: {current_session['rektor_name']}")
+st.markdown(f"Samtal: {current_session['session_name']} | Samtalsledare: {current_session['rektor_name']}")
 
 # === NYTT: Gemensam komponent för ljud/text ===
 transcript, audio_path = audio_text_input(4, current_session['id'], key_prefix="steg4")
@@ -101,7 +101,7 @@ if current_session['steg4_approved']:
             # Skapa text-fil för nedladdning
             plan_text = f"""
 HANDLINGSPLAN - {current_session['session_name']}
-Rektor: {current_session['rektor_name']}
+Samtalsledare: {current_session['rektor_name']}
 Datum: {datetime.now().strftime('%Y-%m-%d')}
 
 PROBLEMFORMULERING:
@@ -143,7 +143,7 @@ HANDLINGSPLAN:
                 styles.add(ParagraphStyle(name='Brödtext', fontSize=12, leading=16, spaceAfter=8, fontName="Helvetica"))
                 elements = []
                 elements.append(Paragraph(f"HANDLINGSPLAN - {current_session['session_name']}", styles['Rubrik']))
-                elements.append(Paragraph(f"Rektor: {current_session['rektor_name']}", styles['Brödtext']))
+                elements.append(Paragraph(f"Samtalsledare: {current_session['rektor_name']}", styles['Brödtext']))
                 elements.append(Paragraph(f"Datum: {datetime.now().strftime('%Y-%m-%d')}", styles['Brödtext']))
                 elements.append(Spacer(1, 8*mm))
                 elements.append(Paragraph("PROBLEMFORMULERING:", styles['Mellanrubrik']))
@@ -245,7 +245,7 @@ if 'handlingsplan_steg4' in st.session_state or current_session.get('steg4_handl
         complete_document = f"""
 # HANDLINGSPLAN - {current_session['session_name']}
 
-**Rektor:** {current_session['rektor_name']}  
+**Samtalsledare:** {current_session['rektor_name']}
 **Datum:** {datetime.now().strftime('%Y-%m-%d')}
 
 ## Problemformulering
@@ -261,7 +261,7 @@ if 'handlingsplan_steg4' in st.session_state or current_session.get('steg4_handl
 {edited_plan}
 
 ---
-*Skapad med Samtalsmodell för rektorer*
+*Skapad med Samtalsmodell för samtalsledare*
 """
         st.markdown(complete_document)
     

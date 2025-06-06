@@ -21,6 +21,7 @@ def create_tables():
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             session_name TEXT,
             rektor_name TEXT,
+            participants TEXT,
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             
@@ -62,15 +63,15 @@ def create_tables():
     conn.commit()
     conn.close()
 
-def create_session(session_name, rektor_name):
+def create_session(session_name, rektor_name, participants=None):
     """Skapa ny session"""
     conn = get_connection()
     cursor = conn.cursor()
     
     cursor.execute('''
-        INSERT INTO sessions (session_name, rektor_name)
-        VALUES (?, ?)
-    ''', (session_name, rektor_name))
+        INSERT INTO sessions (session_name, rektor_name, participants)
+        VALUES (?, ?, ?)
+    ''', (session_name, rektor_name, participants))
     
     session_id = cursor.lastrowid
     conn.commit()
@@ -177,15 +178,15 @@ def get_all_sessions():
     cursor = conn.cursor()
     
     cursor.execute('''
-        SELECT id, session_name, rektor_name, created_at, current_step, completed
-        FROM sessions 
+        SELECT id, session_name, rektor_name, participants, created_at, current_step, completed
+        FROM sessions
         ORDER BY created_at DESC
     ''')
     
     rows = cursor.fetchall()
     conn.close()
     
-    columns = ['id', 'session_name', 'rektor_name', 'created_at', 'current_step', 'completed']
+    columns = ['id', 'session_name', 'rektor_name', 'participants', 'created_at', 'current_step', 'completed']
     return [dict(zip(columns, row)) for row in rows]
 
 def delete_session(session_id):
