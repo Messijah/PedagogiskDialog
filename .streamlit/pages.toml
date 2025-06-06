@@ -1,7 +1,7 @@
 [[pages]]
 path = "main.py"
 name = "Start"
-icon = ""
+icon = "🏠"
 
 [[pages]]
 path = "pages/steg 1.py"
