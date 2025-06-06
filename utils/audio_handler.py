@@ -49,8 +49,18 @@ def transcribe_uploaded_file(uploaded_file, session_id, step_number):
         audio_path = save_uploaded_audio(uploaded_file, session_id, step_number)
         
         if audio_path:
-            # Transkribera filen
-            transcription = transcribe_audio_openai(audio_path)
+            # Kontrollera filstorlek
+            file_size_mb = uploaded_file.size / (1024 * 1024)
+            st.info(f"📊 Filstorlek: {file_size_mb:.1f} MB")
+            
+            # Använd segmenterad transkribering för stora filer
+            if file_size_mb > 20:  # Om filen är större än 20 MB
+                st.info("🔄 Stor fil upptäckt - använder segmenterad transkribering för bästa resultat...")
+                transcription = transcribe_large_audio_file(audio_path)
+            else:
+                # Transkribera normalt för mindre filer
+                transcription = transcribe_audio_openai(audio_path)
+            
             return transcription, audio_path
         else:
             return None, None
@@ -84,6 +94,92 @@ def transcribe_audio_openai(audio_file_path):
         return response.text
     except Exception as e:
         st.error(f"Fel vid transkribering: {e}")
+        return None
+
+def split_audio_file(audio_file_path, segment_duration_minutes=15):
+    """
+    Dela upp en ljudfil i segment för transkribering.
+    Returnerar lista med sökvägar till segment-filer.
+    """
+    try:
+        from pydub import AudioSegment
+        import math
+        
+        # Ladda ljudfilen
+        audio = AudioSegment.from_file(audio_file_path)
+        
+        # Beräkna segment-längd i millisekunder
+        segment_length_ms = segment_duration_minutes * 60 * 1000
+        
+        # Beräkna antal segment
+        total_length_ms = len(audio)
+        num_segments = math.ceil(total_length_ms / segment_length_ms)
+        
+        segment_paths = []
+        base_path = audio_file_path.rsplit('.', 1)[0]
+        
+        for i in range(num_segments):
+            start_ms = i * segment_length_ms
+            end_ms = min((i + 1) * segment_length_ms, total_length_ms)
+            
+            # Extrahera segment
+            segment = audio[start_ms:end_ms]
+            
+            # Spara segment
+            segment_path = f"{base_path}_segment_{i+1}.wav"
+            segment.export(segment_path, format="wav")
+            segment_paths.append(segment_path)
+        
+        return segment_paths
+        
+    except Exception as e:
+        st.error(f"Fel vid segmentering av ljudfil: {e}")
+        return []
+
+def transcribe_large_audio_file(audio_file_path):
+    """
+    Transkribera en stor ljudfil genom att dela upp den i segment.
+    Returnerar sammanslagen transkribering.
+    """
+    try:
+        # Dela upp filen i 15-minuters segment
+        st.info("🔄 Delar upp ljudfilen i 15-minuters segment för optimal transkribering...")
+        segment_paths = split_audio_file(audio_file_path, segment_duration_minutes=15)
+        
+        if not segment_paths:
+            st.error("Kunde inte dela upp ljudfilen")
+            return None
+        
+        st.info(f"📂 Skapade {len(segment_paths)} segment för transkribering")
+        
+        # Transkribera varje segment
+        transcriptions = []
+        for i, segment_path in enumerate(segment_paths):
+            st.info(f"🎯 Transkriberar segment {i+1} av {len(segment_paths)}...")
+            
+            transcription = transcribe_audio_openai(segment_path)
+            if transcription:
+                transcriptions.append(f"[Segment {i+1}]\n{transcription}")
+            else:
+                st.warning(f"⚠️ Segment {i+1} kunde inte transkriberas")
+            
+            # Rensa segment-fil efter transkribering
+            try:
+                os.remove(segment_path)
+            except:
+                pass
+        
+        if transcriptions:
+            # Slå ihop alla transkribering
+            full_transcription = "\n\n".join(transcriptions)
+            st.success(f"✅ Transkribering klar för alla {len(transcriptions)} segment!")
+            return full_transcription
+        else:
+            st.error("❌ Ingen transkribering lyckades")
+            return None
+            
+    except Exception as e:
+        st.error(f"Fel vid segmenterad transkribering: {e}")
         return None
 
 def get_audio_duration(audio_file_path):
@@ -233,6 +329,9 @@ def record_and_transcribe_audio(session_id, step_number, key_prefix=""):
     """
     st.write("🎤 **Ljudinspelning:**")
     
+    # Varning för långa samtal
+    st.info("💡 **Tips för långa samtal (över 15 min):** Systemet hanterar automatiskt segmentering och transkribering för optimala resultat.")
+    
     # Försök använda Streamlits inbyggda audio_input först
     try:
         component_key = f"{key_prefix}_audio_input_{session_id}_{step_number}"
@@ -244,6 +343,10 @@ def record_and_transcribe_audio(session_id, step_number, key_prefix=""):
             st.success("✅ Ljudinspelning mottagen!")
             st.audio(audio_bytes, format="audio/wav")
             
+            # Kontrollera filstorlek och längd
+            file_size_mb = len(audio_bytes.getvalue()) / (1024 * 1024)
+            st.info(f"📊 Filstorlek: {file_size_mb:.1f} MB")
+            
             # Spara ljudfilen automatiskt
             with st.spinner("Sparar ljudfil..."):
                 audio_file_path = save_recorded_audio(audio_bytes.getvalue(), session_id, step_number)
@@ -251,9 +354,14 @@ def record_and_transcribe_audio(session_id, step_number, key_prefix=""):
             if audio_file_path:
                 st.success(f"💾 Ljudfil sparad: {os.path.basename(audio_file_path)}")
                 
-                # Transkribera automatiskt
-                with st.spinner("Transkriberar ljud med OpenAI Whisper..."):
-                    transcription = transcribe_audio_openai(audio_file_path)
+                # Kontrollera om filen behöver segmenteras för transkribering
+                if file_size_mb > 20:  # Om filen är större än 20 MB, segmentera den
+                    st.info("🔄 Stor fil upptäckt - använder segmenterad transkribering för bästa resultat...")
+                    transcription = transcribe_large_audio_file(audio_file_path)
+                else:
+                    # Transkribera normalt för mindre filer
+                    with st.spinner("Transkriberar ljud med OpenAI Whisper..."):
+                        transcription = transcribe_audio_openai(audio_file_path)
                 
                 if transcription:
                     st.success("✅ Transkribering klar!")
@@ -352,9 +460,17 @@ def record_and_transcribe_audio(session_id, step_number, key_prefix=""):
                     if audio_file_path:
                         st.success(f"💾 Ljudfil sparad: {os.path.basename(audio_file_path)}")
                         
-                        # Transkribera automatiskt
-                        with st.spinner("Transkriberar ljud med OpenAI Whisper..."):
-                            transcription = transcribe_audio_openai(audio_file_path)
+                        # Kontrollera filstorlek för segmentering
+                        file_size_mb = len(audio_bytes) / (1024 * 1024)
+                        st.info(f"📊 Filstorlek: {file_size_mb:.1f} MB")
+                        
+                        # Transkribera automatiskt med segmentering för stora filer
+                        if file_size_mb > 20:
+                            st.info("🔄 Stor fil upptäckt - använder segmenterad transkribering för bästa resultat...")
+                            transcription = transcribe_large_audio_file(audio_file_path)
+                        else:
+                            with st.spinner("Transkriberar ljud med OpenAI Whisper..."):
+                                transcription = transcribe_audio_openai(audio_file_path)
                         
                         if transcription:
                             st.success("✅ Transkribering klar!")
