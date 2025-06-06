@@ -17,7 +17,6 @@ init_session()
 
 # Sidebar för session management
 with st.sidebar:
-    st.title("🏠 Start")
     
     # API Key kontroll
     if not validate_api_key():
