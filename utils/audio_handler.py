@@ -53,12 +53,12 @@ def transcribe_uploaded_file(uploaded_file, session_id, step_number):
             file_size_mb = uploaded_file.size / (1024 * 1024)
             st.info(f"📊 Filstorlek: {file_size_mb:.1f} MB")
             
-            # Använd segmenterad transkribering för stora filer
-            if file_size_mb > 20:  # Om filen är större än 20 MB
-                st.info("🔄 Stor fil upptäckt - använder segmenterad transkribering för bästa resultat...")
+            # Använd segmenterad transkribering för alla filer över 5 MB för maximal säkerhet
+            if file_size_mb > 5:  # Sänkt från 20 MB till 5 MB för extra säkerhet
+                st.info("🔄 Använder segmenterad transkribering för optimal säkerhet och resultat...")
                 transcription = transcribe_large_audio_file(audio_path)
             else:
-                # Transkribera normalt för mindre filer
+                # Transkribera normalt endast för mycket små filer
                 transcription = transcribe_audio_openai(audio_path)
             
             return transcription, audio_path
@@ -96,7 +96,7 @@ def transcribe_audio_openai(audio_file_path):
         st.error(f"Fel vid transkribering: {e}")
         return None
 
-def split_audio_file(audio_file_path, segment_duration_minutes=15):
+def split_audio_file(audio_file_path, segment_duration_minutes=10):
     """
     Dela upp en ljudfil i segment för transkribering.
     Returnerar lista med sökvägar till segment-filer.
@@ -142,9 +142,9 @@ def transcribe_large_audio_file(audio_file_path):
     Returnerar sammanslagen transkribering.
     """
     try:
-        # Dela upp filen i 15-minuters segment
-        st.info("🔄 Delar upp ljudfilen i 15-minuters segment för optimal transkribering...")
-        segment_paths = split_audio_file(audio_file_path, segment_duration_minutes=15)
+        # Dela upp filen i 10-minuters segment för maximal säkerhet
+        st.info("🔄 Delar upp ljudfilen i 10-minuters segment för optimal transkribering...")
+        segment_paths = split_audio_file(audio_file_path, segment_duration_minutes=10)
         
         if not segment_paths:
             st.error("Kunde inte dela upp ljudfilen")
@@ -329,8 +329,8 @@ def record_and_transcribe_audio(session_id, step_number, key_prefix=""):
     """
     st.write("🎤 **Ljudinspelning:**")
     
-    # Varning för långa samtal
-    st.info("💡 **Tips för långa samtal (över 15 min):** Systemet hanterar automatiskt segmentering och transkribering för optimala resultat.")
+    # Information om segmentering
+    st.info("💡 **Automatisk segmentering:** Systemet delar automatiskt upp filer över 5 MB i 10-minuters segment för optimal säkerhet och resultat.")
     
     # Försök använda Streamlits inbyggda audio_input först
     try:
@@ -355,11 +355,11 @@ def record_and_transcribe_audio(session_id, step_number, key_prefix=""):
                 st.success(f"💾 Ljudfil sparad: {os.path.basename(audio_file_path)}")
                 
                 # Kontrollera om filen behöver segmenteras för transkribering
-                if file_size_mb > 20:  # Om filen är större än 20 MB, segmentera den
-                    st.info("🔄 Stor fil upptäckt - använder segmenterad transkribering för bästa resultat...")
+                if file_size_mb > 5:  # Sänkt från 20 MB till 5 MB för extra säkerhet
+                    st.info("🔄 Använder segmenterad transkribering för optimal säkerhet och resultat...")
                     transcription = transcribe_large_audio_file(audio_file_path)
                 else:
-                    # Transkribera normalt för mindre filer
+                    # Transkribera normalt endast för mycket små filer
                     with st.spinner("Transkriberar ljud med OpenAI Whisper..."):
                         transcription = transcribe_audio_openai(audio_file_path)
                 
@@ -464,9 +464,9 @@ def record_and_transcribe_audio(session_id, step_number, key_prefix=""):
                         file_size_mb = len(audio_bytes) / (1024 * 1024)
                         st.info(f"📊 Filstorlek: {file_size_mb:.1f} MB")
                         
-                        # Transkribera automatiskt med segmentering för stora filer
-                        if file_size_mb > 20:
-                            st.info("🔄 Stor fil upptäckt - använder segmenterad transkribering för bästa resultat...")
+                        # Transkribera automatiskt med segmentering för säkerhet
+                        if file_size_mb > 5:  # Sänkt från 20 MB till 5 MB för extra säkerhet
+                            st.info("🔄 Använder segmenterad transkribering för optimal säkerhet och resultat...")
                             transcription = transcribe_large_audio_file(audio_file_path)
                         else:
                             with st.spinner("Transkriberar ljud med OpenAI Whisper..."):

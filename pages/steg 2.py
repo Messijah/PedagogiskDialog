@@ -173,10 +173,19 @@ if 'analysis_steg2' in st.session_state or current_session.get('steg2_ai_analysi
     if 'perspective_suggestions' in st.session_state:
         st.info("**AI-förslag på perspektiv att fördjupa:**")
         st.markdown(st.session_state.perspective_suggestions)
-        st.markdown("Du kan använda dessa förslag som grund eller skriva egna perspektiv nedan:")
+        
+        # Knapp för att godkänna AI-förslag
+        col1, col2 = st.columns([1, 3])
+        with col1:
+            if st.button("✅ Godkänn AI-förslag", type="secondary"):
+                st.session_state.selected_perspectives_text = st.session_state.perspective_suggestions
+                st.rerun()
+        with col2:
+            st.markdown("*Eller skriv egna perspektiv nedan:*")
     
     selected_perspectives = st.text_area(
         "Beskriv de perspektiv som ska fördjupas:",
+        value=st.session_state.get('selected_perspectives_text', ''),
         height=150,
         placeholder="Exempel: 1. Lärarnas oro för ökad arbetsbelastning, 2. Elevernas behov av mer individuell support, 3. Föräldrarnas förväntningar på digitala verktyg",
         help="Skriv de 2-3 viktigaste perspektiven som behöver fördjupas"

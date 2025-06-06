@@ -54,8 +54,16 @@ with col2:
     st.markdown("**Valda perspektiv från Steg 2:**")
     selected_perspectives = current_session.get('steg2_selected_perspectives', '')
     if selected_perspectives:
-        st.info(selected_perspectives)
+        # Dekoda eventuella unicode-escapes
+        decoded_perspectives = selected_perspectives
+        try:
+            if isinstance(selected_perspectives, str) and ('\\u' in selected_perspectives or '\\n' in selected_perspectives):
+                decoded_perspectives = bytes(selected_perspectives, "utf-8").decode("unicode_escape")
+        except Exception:
+            pass
+        st.info(decoded_perspectives)
     else:
+        decoded_perspectives = ""
         st.warning("Inga perspektiv valda från Steg 2")
 
 # Visa befintlig data om den finns
@@ -120,7 +128,7 @@ if selected_perspectives:
         - Vem bör ansvara för vad?
         
         **Era valda perspektiv att fördjupa:**
-        {selected_perspectives}
+        {decoded_perspectives}
         """)
 
 # === NYTT: Gemensam komponent för ljud/text ===
