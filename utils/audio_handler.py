@@ -112,7 +112,7 @@ def validate_audio_file(uploaded_file, max_duration_seconds=36):
     """
     Kontrollera att uppladdad fil är under maxstorlek (MB).
     """
-    max_size_mb = 5
+    max_size_mb = 100  # Ökat från 5 MB till 100 MB för längre samtal
     if uploaded_file.size > max_size_mb * 1024 * 1024:
         return False, f"Filen är för stor. Max: {max_size_mb} MB."
     return True, "OK"
