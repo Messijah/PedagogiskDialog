@@ -83,7 +83,7 @@ if current_session['steg3_approved']:
     
     with col2:
         if st.button("← Tillbaka till Steg 2"):
-            st.switch_page("pages/steg2.py")
+            st.switch_page("pages/steg 2.py")
     
     with col3:
         if st.button("➡️ Gå till Steg 4"):

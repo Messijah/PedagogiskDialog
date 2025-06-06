@@ -4,21 +4,21 @@ name = "Start"
 icon = ""
 
 [[pages]]
-path = "pages/steg1.py"
+path = "pages/steg 1.py"
 name = "Steg 1"
 icon = ""
 
 [[pages]]
-path = "pages/steg2.py"
+path = "pages/steg 2.py"
 name = "Steg 2"
 icon = ""
 
 [[pages]]
-path = "pages/steg3.py"
+path = "pages/steg 3.py"
 name = "Steg 3"
 icon = ""
 
 [[pages]]
-path = "pages/steg4.py"
+path = "pages/steg 4.py"
 name = "Steg 4"
 icon = ""

@@ -25,7 +25,7 @@ st.set_page_config(
 if not is_step_accessible(4):
     st.error("Du måste först slutföra Steg 3 innan du kan komma åt Steg 4.")
     if st.button("← Gå till Steg 3"):
-        st.switch_page("pages/steg3.py")
+        st.switch_page("pages/steg 3.py")
     st.stop()
 
 current_session = get_current_session()
@@ -51,7 +51,7 @@ if transcript:
 col1, col2, col3 = st.columns([1, 1, 3])
 with col1:
     if st.button("← Steg 3"):
-        st.switch_page("pages/steg3.py")
+        st.switch_page("pages/steg 3.py")
 with col2:
     if st.button("🏠 Start"):
         st.switch_page("main.py")
@@ -192,7 +192,7 @@ Handlingsplanen bör innehålla:
 
 # Ytterligare input för handlingsplan
 st.markdown("---")
-st.subheader("💡 Kompletterande information för handlingsplanen")
+st.subheader("Kompletterande information för handlingsplanen")
 
 additional_info = st.text_area(
     "Finns det ytterligare information eller önskemål för handlingsplanen?",
@@ -202,7 +202,7 @@ additional_info = st.text_area(
 )
 
 # Skapa handlingsplan
-if st.button("🤖 Skapa handlingsplan", type="primary"):
+if st.button("Skapa handlingsplan", type="primary"):
     # Använd transkribering om den finns, annars slutsatser från steg 3
     slutsats_input = st.session_state.get('transcript_steg4') or current_session.get('steg3_conclusions')
     if not slutsats_input:
@@ -226,7 +226,7 @@ if 'handlingsplan_steg4' in st.session_state or current_session.get('steg4_handl
     handlingsplan = st.session_state.get('handlingsplan_steg4', current_session.get('steg4_handlingsplan'))
     
     st.markdown("---")
-    st.subheader("🤖 AI-genererad handlingsplan")
+    st.subheader("AI-genererad handlingsplan")
     
     # Visa handlingsplan i redigerbar form
     edited_plan = st.text_area(

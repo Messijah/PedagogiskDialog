@@ -31,7 +31,7 @@ Ge ett konkret förslag på inledning och struktur för samtalet, inklusive:
 4. Hur trygghet och engagemang kan skapas
 5. Förslag på 2-3 öppna frågor som bjuder in olika perspektiv
 
-Svara på svenska i tydligt strukturerat format med markdown.
+Svara på svenska i tydligt strukturerat format med markdown. Använd INTE emojis i ditt svar.
 """
 
 STEG2_PROMPT = """
@@ -45,7 +45,7 @@ UPPGIFT: Sammanfatta och strukturera de olika perspektiv, argument och synsätt 
 URSPRUNGLIGT PROBLEM: {problem_beskrivning}
 TRANSKRIBERING: {transcript}
 
-Ge en tydlig och strukturerad sammanfattning som underlag för fördjupad diskussion. Avsluta med rekommendation om vilka perspektiv som bör väljas för fördjupning.
+Ge en tydlig och strukturerad sammanfattning som underlag för fördjupad diskussion. Avsluta med rekommendation om vilka perspektiv som bör väljas för fördjupning. Använd INTE emojis i ditt svar.
 """
 
 STEG3_PROMPT = """
@@ -62,7 +62,7 @@ URSPRUNGLIGT PROBLEM: {problem_beskrivning}
 VALDA PERSPEKTIV FRÅN STEG 2: {selected_perspectives}
 FÖRDJUPAD DISKUSSION: {transcript}
 
-Ge en tydlig sammanfattning av slutsatser och möjliga åtgärder.
+Ge en tydlig sammanfattning av slutsatser och möjliga åtgärder. Använd INTE emojis i ditt svar.
 """
 
 STEG4_PROMPT = """
@@ -76,7 +76,7 @@ UPPGIFT: Skriv en konkret handlingsplan enligt denna mall:
 
 UNDERLAG: {conclusions}
 
-Skriv handlingsplanen tydligt och strukturerat på svenska.
+Skriv handlingsplanen tydligt och strukturerat på svenska. Använd INTE emojis i ditt svar.
 """
 
 MAX_CHUNK_SIZE = 2000  # sänkt till 2000 tecken per del
@@ -148,7 +148,7 @@ def get_ai_response(prompt, max_tokens=2000):
         response = client.chat.completions.create(
             model="gpt-4",
             messages=[
-                {"role": "system", "content": "Du är en expert på pedagogisk ledning i svenska skolor."},
+                {"role": "system", "content": "Du är en expert på pedagogisk ledning i svenska skolor. Använd aldrig emojis i dina svar - skriv endast ren text."},
                 {"role": "user", "content": prompt}
             ],
             max_tokens=max_tokens,
