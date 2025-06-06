@@ -118,8 +118,6 @@ if not current_session:
     st.stop()
 
 # Navigation för stegen
-st.markdown("---")
-
 # Progress bar
 progress = get_session_progress()
 st.progress(progress, text=f"Framsteg: {int(progress * 100)}% ({int(progress * 4)}/4 steg slutförda)")
