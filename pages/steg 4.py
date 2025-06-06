@@ -70,7 +70,14 @@ with st.expander("Visa fullständig sammanfattning"):
         
         st.markdown("**Valda perspektiv (Steg 2):**")
         if current_session.get('steg2_selected_perspectives'):
-            st.info(current_session['steg2_selected_perspectives'])
+            # Dekoda eventuella unicode-escapes
+            perspectives_text = current_session['steg2_selected_perspectives']
+            try:
+                if isinstance(perspectives_text, str) and ('\\u' in perspectives_text or '\\n' in perspectives_text):
+                    perspectives_text = bytes(perspectives_text, "utf-8").decode("unicode_escape")
+            except Exception:
+                pass
+            st.info(perspectives_text)
         else:
             st.warning("Inga perspektiv dokumenterade")
     
@@ -252,7 +259,7 @@ if 'handlingsplan_steg4' in st.session_state or current_session.get('steg4_handl
 {current_session['problem_beskrivning']}
 
 ## Perspektiv som diskuterades
-{current_session.get('steg2_selected_perspectives', 'Ej dokumenterat')}
+{current_session.get('steg2_selected_perspectives', 'Ej dokumenterat').replace('\\n', '\n') if current_session.get('steg2_selected_perspectives') else 'Ej dokumenterat'}
 
 ## Slutsatser från diskussion
 {current_session.get('steg3_conclusions', 'Ej dokumenterat')}

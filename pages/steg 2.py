@@ -121,7 +121,7 @@ if 'transcript_steg2' in st.session_state or current_session.get('steg2_transcri
         st.session_state.transcript_steg2 = edited_transcript
     
     # Analysera perspektiv
-    if st.button("🤖 Analysera perspektiv", type="primary"):
+    if st.button("Analysera perspektiv", type="primary"):
         with st.spinner("AI analyserar de olika perspektiven i samtalet..."):
             analysis = analyze_perspectives_steg2(
                 current_session['problem_beskrivning'],
@@ -146,6 +146,34 @@ if 'analysis_steg2' in st.session_state or current_session.get('steg2_ai_analysi
     st.markdown("---")
     st.subheader("Välj perspektiv för fördjupning i Steg 3")
     st.markdown("Baserat på analysen ovan, vilka 2-3 perspektiv vill du fördjupa i nästa steg?")
+    
+    # Knapp för att få AI-förslag på perspektiv
+    if st.button("Få förslag på perspektiv att fördjupa", type="secondary"):
+        with st.spinner("AI föreslår perspektiv baserat på analysen..."):
+            # Extrahera förslag från analysen
+            suggestion_prompt = f"""
+            Baserat på denna analys av perspektiv, föreslå 2-3 konkreta perspektiv som bör fördjupas i nästa steg.
+            
+            ANALYS:
+            {analysis}
+            
+            Ge endast en kort lista med 2-3 perspektiv som är viktigast att fördjupa, formaterat som:
+            1. [Perspektiv 1]
+            2. [Perspektiv 2]
+            3. [Perspektiv 3]
+            """
+            
+            from utils.ai_helper import get_ai_response
+            suggestions = get_ai_response(suggestion_prompt, max_tokens=300)
+            if suggestions:
+                st.session_state.perspective_suggestions = suggestions
+                st.rerun()
+    
+    # Visa AI-förslag om de finns
+    if 'perspective_suggestions' in st.session_state:
+        st.info("**AI-förslag på perspektiv att fördjupa:**")
+        st.markdown(st.session_state.perspective_suggestions)
+        st.markdown("Du kan använda dessa förslag som grund eller skriva egna perspektiv nedan:")
     
     selected_perspectives = st.text_area(
         "Beskriv de perspektiv som ska fördjupas:",
