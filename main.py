@@ -161,7 +161,7 @@ with col4:
     accessible = is_step_accessible(4)
     if accessible:
         if st.button("Steg 4: Handlingsplan", type="primary" if current_session['current_step'] == 4 else "secondary", use_container_width=True):
-            st.switch_page("pages/steg4.py")
+            st.switch_page("pages/steg 4.py")
     else:
         st.button("Steg 4: Handlingsplan", disabled=True, use_container_width=True)
     if current_session['steg4_approved']:

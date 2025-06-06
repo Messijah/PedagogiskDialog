@@ -63,7 +63,7 @@ if current_session['steg1_approved']:
     
     with col2:
         if st.button("➡️ Gå till Steg 2"):
-            st.switch_page("pages/steg2.py")
+            st.switch_page("pages/steg 2.py")
     
     # Om inte i redigeringsläge, stoppa här
     if not st.session_state.get('edit_steg1', False):
@@ -175,7 +175,7 @@ if 'ai_suggestion_steg1' in st.session_state:
                     del st.session_state[key]
             
             st.success("Steg 1 godkänt! Går till Steg 2...")
-            st.switch_page("pages/steg2.py")
+            st.switch_page("pages/steg 2.py")
     
     with col2:
         if st.button("🔄 Revidera förslag"):

@@ -87,7 +87,7 @@ if current_session['steg3_approved']:
     
     with col3:
         if st.button("➡️ Gå till Steg 4"):
-            st.switch_page("pages/steg4.py")
+            st.switch_page("pages/steg 4.py")
     
     # Om inte i redigeringsläge, stoppa här
     if not st.session_state.get('edit_steg3', False):
@@ -214,7 +214,7 @@ if 'analysis_steg3' in st.session_state or current_session.get('steg3_ai_analysi
                         del st.session_state[key]
                 
                 st.success("Steg 3 godkänt! Går till Steg 4...")
-                st.switch_page("pages/steg4.py")
+                st.switch_page("pages/steg 4.py")
     
     with col2:
         if st.button("🔄 Analysera om"):
