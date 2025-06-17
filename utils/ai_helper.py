@@ -86,7 +86,7 @@ def split_text(text, max_length=MAX_CHUNK_SIZE):
     return [text[i:i+max_length] for i in range(0, len(text), max_length)]
 
 # Ny hjälpfunktion för att analysera långa texter stegvis
-@st.cache_data(show_spinner=False)
+@st.cache_data(show_spinner=False, ttl=0)
 def analyze_long_text(prompt_template, **kwargs):
     text = kwargs.get('transcript') or kwargs.get('conclusions')
     if not text:
@@ -141,7 +141,7 @@ def analyze_long_text(prompt_template, **kwargs):
         else:
             return get_ai_response(sammanfattningsprompt)
 
-@st.cache_data(show_spinner=False)
+@st.cache_data(show_spinner=False, ttl=0)
 def get_ai_response(prompt, max_tokens=2000):
     """Hämta AI-svar från OpenAI"""
     try:
