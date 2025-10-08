@@ -187,3 +187,25 @@ section[data-testid="stSidebar"] .stButton > button {
 .block-container {
     padding-top: 2rem;
 }
+
+/* Dölj Streamlit-meny och footer för produktionsapp */
+#MainMenu {
+    visibility: hidden;
+}
+
+button[kind="header"] {
+    display: none !important;
+}
+
+footer {
+    visibility: hidden;
+}
+
+footer:after {
+    content: 'Pedagogiskt Samtalsstöd - Lunds kommun';
+    visibility: visible;
+    display: block;
+    text-align: center;
+    padding: 1rem 0;
+    color: #6c757d;
+}
