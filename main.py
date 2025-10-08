@@ -123,43 +123,37 @@ if not current_session:
     st.info("💡 Skapa eller välj ett samtal i sidopanelen för att komma igång.")
     st.markdown('</div>', unsafe_allow_html=True)
 
-    # Steginformation i kolumner
+    # Steginformation
     st.markdown("### Så fungerar det")
     col1, col2 = st.columns(2)
 
     with col1:
-        st.markdown('<div class="step-card">', unsafe_allow_html=True)
-        st.markdown("#### 🎯 Steg 1: Problembeskrivning")
+        st.markdown("**Steg 1: Problembeskrivning**")
         st.markdown("""
         - Definiera problemet eller frågan som ska diskuteras
         - Få AI-stöd för hur du kan presentera det för gruppen
         """)
-        st.markdown('</div>', unsafe_allow_html=True)
+        st.markdown("")
 
-        st.markdown('<div class="step-card">', unsafe_allow_html=True)
-        st.markdown("#### 🔍 Steg 3: Fördjupad diskussion")
+        st.markdown("**Steg 3: Fördjupad diskussion**")
         st.markdown("""
         - Fördjupa diskussionen kring utvalda perspektiv
         - Identifiera slutsatser och konsensus
         """)
-        st.markdown('</div>', unsafe_allow_html=True)
 
     with col2:
-        st.markdown('<div class="step-card">', unsafe_allow_html=True)
-        st.markdown("#### 🎤 Steg 2: Perspektivinventering")
+        st.markdown("**Steg 2: Perspektivinventering**")
         st.markdown("""
         - Spela in gruppsamtalet där olika perspektiv framkommer
         - AI sammanfattar och kategoriserar de olika synvinklarna
         """)
-        st.markdown('</div>', unsafe_allow_html=True)
+        st.markdown("")
 
-        st.markdown('<div class="step-card">', unsafe_allow_html=True)
-        st.markdown("#### 📋 Steg 4: Handlingsplan")
+        st.markdown("**Steg 4: Handlingsplan**")
         st.markdown("""
         - Skapa en strukturerad handlingsplan baserat på diskussionen
         - Exportera färdig plan med ansvar, tidsramar och uppföljning
         """)
-        st.markdown('</div>', unsafe_allow_html=True)
 
     st.stop()
 
