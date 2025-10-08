@@ -1,0 +1,11 @@
+services:
+  - type: web
+    name: pedagogisk-dialog
+    env: docker
+    region: frankfurt
+    plan: starter
+    envVars:
+      - key: OPENAI_API_KEY
+        sync: false
+    autoDeploy: true
+    healthCheckPath: /_stcore/health
