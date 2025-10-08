@@ -1,0 +1,189 @@
+/* Lunds kommun färgpalett */
+:root {
+    --lund-purple: #5B124D;
+    --lund-purple-light: #7a1866;
+    --lund-purple-dark: #3d0c33;
+    --lund-grey: #6c757d;
+    --lund-light-bg: #f8f9fa;
+}
+
+/* Huvudlayout */
+.main {
+    background-color: #ffffff;
+}
+
+/* Header styling - transparent, ingen höjd */
+header[data-testid="stHeader"] {
+    background-color: transparent !important;
+    height: 60px !important;
+}
+
+header[data-testid="stHeader"] > div {
+    background-color: transparent !important;
+}
+
+/* Sidebar toggle button */
+button[data-testid="collapsedControl"] {
+    top: 10px !important;
+}
+
+button[data-testid="baseButton-header"] {
+    color: var(--lund-purple) !important;
+}
+
+button[data-testid="baseButton-header"] svg {
+    fill: var(--lund-purple) !important;
+}
+
+
+/* Sidebar styling */
+section[data-testid="stSidebar"] {
+    background-color: var(--lund-light-bg);
+}
+
+section[data-testid="stSidebar"] > div {
+    background-color: var(--lund-light-bg);
+    padding-top: 2rem;
+}
+
+/* Logo container */
+.logo-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 2rem 0;
+    background-color: white;
+    border-bottom: 1px solid #e0e0e0;
+    margin-bottom: 2rem;
+}
+
+/* Hero section */
+.hero-section {
+    text-align: center;
+    padding: 3rem 2rem;
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+.hero-title {
+    font-size: 3rem;
+    font-weight: 700;
+    color: var(--lund-purple);
+    margin-bottom: 1.5rem;
+    line-height: 1.2;
+}
+
+.hero-subtitle {
+    font-size: 1.2rem;
+    color: var(--lund-grey);
+    line-height: 1.6;
+    margin-bottom: 2rem;
+}
+
+/* Card styling */
+.info-card {
+    background: white;
+    border-radius: 12px;
+    padding: 2rem;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    margin: 1.5rem 0;
+    border: 1px solid #e0e0e0;
+}
+
+.info-card h3 {
+    color: var(--lund-purple);
+    font-size: 1.3rem;
+    margin-bottom: 1rem;
+    font-weight: 600;
+    border-bottom: 2px solid var(--lund-purple);
+    padding-bottom: 0.5rem;
+}
+
+/* Button styling */
+.stButton > button {
+    border-radius: 8px;
+    font-weight: 500;
+    transition: all 0.2s ease;
+}
+
+.stButton > button[kind="primary"] {
+    background-color: var(--lund-purple);
+    border: none;
+}
+
+.stButton > button[kind="primary"]:hover {
+    background-color: var(--lund-purple-dark);
+    box-shadow: 0 4px 12px rgba(91, 18, 77, 0.3);
+}
+
+.stButton > button[kind="secondary"] {
+    background-color: white;
+    border: 2px solid var(--lund-purple);
+    color: var(--lund-purple);
+}
+
+.stButton > button[kind="secondary"]:hover {
+    background-color: var(--lund-light-bg);
+    border-color: var(--lund-purple-dark);
+}
+
+/* Progress bar */
+.stProgress > div > div {
+    background-color: var(--lund-purple);
+}
+
+/* Form elements */
+.stTextInput > div > div > input,
+.stTextArea > div > div > textarea,
+.stSelectbox > div > div > select {
+    border-radius: 6px;
+    border: 1px solid #ced4da;
+    padding: 0.75rem;
+}
+
+.stTextInput > div > div > input:focus,
+.stTextArea > div > div > textarea:focus {
+    border-color: var(--lund-purple);
+    box-shadow: 0 0 0 0.2rem rgba(91, 18, 77, 0.15);
+}
+
+/* Expander */
+.streamlit-expanderHeader {
+    background-color: var(--lund-light-bg);
+    border-radius: 8px;
+    font-weight: 500;
+    color: var(--lund-purple);
+}
+
+/* Success/Info/Warning boxes */
+.stAlert {
+    border-radius: 8px;
+}
+
+/* Step cards */
+.step-card {
+    background: white;
+    border-radius: 10px;
+    padding: 1.5rem;
+    border-left: 4px solid var(--lund-purple);
+    margin: 1rem 0;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+}
+
+/* Divider */
+hr {
+    border-color: #e0e0e0;
+    margin: 2rem 0;
+}
+
+/* Sidebar buttons */
+section[data-testid="stSidebar"] .stButton > button {
+    width: 100%;
+    text-align: left;
+    border-radius: 6px;
+}
+
+/* Remove top padding from main content */
+.block-container {
+    padding-top: 2rem;
+}

@@ -6,14 +6,34 @@ from utils.ai_helper import validate_api_key
 
 # Konfigurera Streamlit
 st.set_page_config(
-    page_title="Start",
-    page_icon=None,
+    page_title="Pedagogiskt Samtalsstöd - Lunds kommun",
+    page_icon="🎓",
     layout="wide",
     initial_sidebar_state="expanded"
 )
 
+# Ladda CSS
+def load_css():
+    css_path = os.path.join(os.path.dirname(__file__), "assets", "style.css")
+    if os.path.exists(css_path):
+        with open(css_path) as f:
+            st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
+
+load_css()
+
 # Initialisera session
 init_session()
+
+# Title och logga
+st.markdown('<div style="text-align: center; padding: 1rem 0;">', unsafe_allow_html=True)
+st.markdown('<div style="color: #5B124D; font-size: 1.8rem; font-weight: 600; margin-bottom: 0.5rem; text-align: center;">Pedagogiskt samtalsstöd</div>', unsafe_allow_html=True)
+logo_path = os.path.join(os.path.dirname(__file__), "assets", "lunds-kommun-logo.svg")
+if os.path.exists(logo_path):
+    with open(logo_path, "r") as f:
+        svg_content = f.read()
+        svg_content = svg_content.replace('<svg', '<svg width="80"')
+        st.markdown(f'<div style="display: flex; justify-content: center;">{svg_content}</div>', unsafe_allow_html=True)
+st.markdown('</div>', unsafe_allow_html=True)
 
 # Sidebar för session management
 with st.sidebar:
@@ -91,30 +111,56 @@ with st.sidebar:
                     st.rerun()
 
 # Huvudinnehåll
-st.title("Pedagogiskt samtalsstöd")
-
 # Kontrollera om vi har en aktiv session
 if not current_session:
-    st.info("Skapa eller välj ett samtal i sidopanelen för att komma igång.")
-    st.markdown("""
-    Detta verktyg hjälper dig som samtalsledare att leda strukturerade samtal genom en tydlig 4-stegs process:
+    # Hero section
+    st.markdown('<div class="hero-section">', unsafe_allow_html=True)
+    st.markdown('<p class="hero-subtitle">Ett digitalt verktyg för att leda strukturerade pedagogiska samtal. Systemet analyserar automatiskt innehållet och ger dig värdefulla insikter.</p>', unsafe_allow_html=True)
+    st.markdown('</div>', unsafe_allow_html=True)
 
-    **Steg 1: Problembeskrivning**
-    - Definiera problemet eller frågan som ska diskuteras
-    - Få stöd för hur du kan presentera det för gruppen
+    # Info card
+    st.markdown('<div class="info-card">', unsafe_allow_html=True)
+    st.info("💡 Skapa eller välj ett samtal i sidopanelen för att komma igång.")
+    st.markdown('</div>', unsafe_allow_html=True)
 
-    **Steg 2: Perspektivinventering**
-    - Spela in gruppsamtalet där olika perspektiv framkommer
-    - Sammanfatta och kategorisera de olika synvinklarna
+    # Steginformation i kolumner
+    st.markdown("### Så fungerar det")
+    col1, col2 = st.columns(2)
 
-    **Steg 3: Fördjupad diskussion**
-    - Fördjupa diskussionen kring utvalda perspektiv
-    - Identifiera slutsatser och konsensus
+    with col1:
+        st.markdown('<div class="step-card">', unsafe_allow_html=True)
+        st.markdown("#### 🎯 Steg 1: Problembeskrivning")
+        st.markdown("""
+        - Definiera problemet eller frågan som ska diskuteras
+        - Få AI-stöd för hur du kan presentera det för gruppen
+        """)
+        st.markdown('</div>', unsafe_allow_html=True)
 
-    **Steg 4: Handlingsplan**
-    - Skapa en strukturerad handlingsplan baserat på diskussionen
-    - Exportera färdig plan med ansvar, tidsramar och uppföljning
-    """)
+        st.markdown('<div class="step-card">', unsafe_allow_html=True)
+        st.markdown("#### 🔍 Steg 3: Fördjupad diskussion")
+        st.markdown("""
+        - Fördjupa diskussionen kring utvalda perspektiv
+        - Identifiera slutsatser och konsensus
+        """)
+        st.markdown('</div>', unsafe_allow_html=True)
+
+    with col2:
+        st.markdown('<div class="step-card">', unsafe_allow_html=True)
+        st.markdown("#### 🎤 Steg 2: Perspektivinventering")
+        st.markdown("""
+        - Spela in gruppsamtalet där olika perspektiv framkommer
+        - AI sammanfattar och kategoriserar de olika synvinklarna
+        """)
+        st.markdown('</div>', unsafe_allow_html=True)
+
+        st.markdown('<div class="step-card">', unsafe_allow_html=True)
+        st.markdown("#### 📋 Steg 4: Handlingsplan")
+        st.markdown("""
+        - Skapa en strukturerad handlingsplan baserat på diskussionen
+        - Exportera färdig plan med ansvar, tidsramar och uppföljning
+        """)
+        st.markdown('</div>', unsafe_allow_html=True)
+
     st.stop()
 
 # Navigation för stegen
