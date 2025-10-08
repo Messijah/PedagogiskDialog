@@ -26,7 +26,7 @@ init_session()
 
 # Title och logga
 st.markdown('<div style="text-align: center; padding: 1rem 0;">', unsafe_allow_html=True)
-st.markdown('<div style="color: #5B124D; font-size: 1.8rem; font-weight: 600; margin-bottom: 0.5rem; text-align: center;">Pedagogiskt samtalsstöd</div>', unsafe_allow_html=True)
+st.markdown('<div style="color: #262730; font-size: 1.8rem; font-weight: 600; margin-bottom: 0.5rem; text-align: center;">Pedagogiskt samtalsstöd</div>', unsafe_allow_html=True)
 logo_path = os.path.join(os.path.dirname(__file__), "assets", "lunds-kommun-logo.svg")
 if os.path.exists(logo_path):
     with open(logo_path, "r") as f:
@@ -116,11 +116,7 @@ if not current_session:
     # Hero section
     st.markdown('<div class="hero-section">', unsafe_allow_html=True)
     st.markdown('<p class="hero-subtitle">Ett digitalt verktyg för att leda strukturerade pedagogiska samtal. Systemet analyserar automatiskt innehållet och ger dig värdefulla insikter.</p>', unsafe_allow_html=True)
-    st.markdown('</div>', unsafe_allow_html=True)
-
-    # Info card
-    st.markdown('<div class="info-card">', unsafe_allow_html=True)
-    st.info("💡 Skapa eller välj ett samtal i sidopanelen för att komma igång.")
+    st.markdown('<p style="text-align: center; color: #6c757d; margin-top: 2rem;">💡 Skapa eller välj ett samtal i sidopanelen för att komma igång.</p>', unsafe_allow_html=True)
     st.markdown('</div>', unsafe_allow_html=True)
 
     # Steginformation
