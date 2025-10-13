@@ -12,71 +12,259 @@ client = OpenAI(api_key=os.getenv('OPENAI_API_KEY'))
 
 # AI Prompts
 STEG1_PROMPT = """
-Du är en samtalscoach för rektorer i svensk skola och expert på att leda professionella samtal enligt LPGD-modellen.
+Du är en expert på att leda professionella samtal enligt LPGD-modellen (Leading Professional Group Discussions). Din expertis bygger på forskningsbaserade principer för hur rektorer effektivt kan leda samtal i svenska skolor.
 
-UPPGIFT: Utifrån följande beskrivning av ett problem eller en fråga, ge ett förslag på hur rektorn kan presentera detta för sin personalgrupp på ett sätt som:
-- Tydligt definierar syftet och målet med samtalet (Sätt scenen)
-- Kopplar till skolans mål/vision
-- Skapar trygghet och engagemang
-- Lägger grunden för en öppen och lösningsfokuserad dialog
+LPGD-MODELLENS FÖRSTA STEG: "SÄTT SCENEN" (Setting the Stage)
+Detta steg är kritiskt för att skapa förutsättningar för ett konstruktivt samtal. Forskning visar att rektorer ofta fokuserar för lite på detta viktiga ramverk. Ett effektivt "sätt scenen"-moment inkluderar:
 
+1. RAMAR och FÖRTYDLIGA (Frame and clarify):
+   - Tydliggör syftet med samtalet
+   - Definiera problemet eller frågeställningen konkret
+   - Förklara varför detta är viktigt NU
+
+2. SKAPA TRYGGHET (Create psychological safety):
+   - Etablera öppna normer för dialog
+   - Uppmuntra olika perspektiv
+   - Kommunicera att alla röster är viktiga
+
+3. KOPPLA TILL SKOLANS VÄRDERINGAR OCH MÅL:
+   - Länka problemet till skolans vision och värdegrunder
+   - Visa hur detta påverkar elevernas lärande
+   - Tydliggör relevansen för personalgruppen
+
+INPUT:
 PROBLEM/FRÅGA: {problem_beskrivning}
 PERSONALGRUPP: {personal_grupp}
 KONTEXT: {kontext}
 
-Ge ett konkret förslag på inledning och struktur för samtalet, inklusive:
-1. Hur rektorn kan sätta scenen
-2. Exempel på öppningsfraser
-3. Hur samtalet kan kopplas till skolans mål/vision
-4. Hur trygghet och engagemang kan skapas
-5. Förslag på 2-3 öppna frågor som bjuder in olika perspektiv
+UPPGIFT:
+Skapa ett konkret, LPGD-baserat förslag för hur rektorn ska inleda och strukturera detta samtal. Ditt förslag ska innehålla:
 
-Svara på svenska i tydligt strukturerat format med markdown. Använd INTE emojis i ditt svar.
+**1. Inledande ramverk (2-3 minuter)**
+   - Hur rektorn öppnar och sätter kontexten
+   - Koppling till skolans vision och elevernas bästa
+   - Tydliggörande av syftet med samtalet
+
+**2. Problemformulering och förtydligande**
+   - Konkret beskrivning av utmaningen/frågan
+   - Varför det är viktigt att diskutera detta nu
+   - Vad som står på spel
+
+**3. Skapande av trygghet och engagemang**
+   - Hur rektorn kommunicerar att alla perspektiv är välkomna
+   - Etablering av samtalsnormer (lyssnande, respekt, öppenhet)
+   - Uppmuntran till olika synsätt
+
+**4. Konkreta öppningsfraser och exempel**
+   - 2-3 exakta formuleringar rektorn kan använda
+   - Tonalitet som skapar öppenhet utan att styra slutsatser
+
+**5. Inbjudande frågor för olika perspektiv**
+   - 3-4 öppna frågor som bjuder in olika synsätt
+   - Frågor som uppmuntrar reflektion snarare än snabba svar
+   - Frågor som hjälper gruppen se problemet från olika vinklar
+
+Svara på svenska i tydligt strukturerat format med markdown. Använd INTE emojis. Basera ditt svar på forskningsbaserade LPGD-principer.
 """
 
 STEG2_PROMPT = """
-Du är en samtalscoach för rektorer. Här är en transkribering från ett samtal där olika perspektiv på ett problem har diskuterats.
+Du är en expert på att leda professionella samtal enligt LPGD-modellen (Leading Professional Group Discussions). Din expertis bygger på forskningsbaserade principer för hur rektorer effektivt kan leda samtal i svenska skolor.
 
-UPPGIFT: Sammanfatta och strukturera de olika perspektiv, argument och synsätt som framkommit enligt LPGD-modellen:
-1. Bjud in olika perspektiv och argument
-2. Identifiera mönster, gemensamma nämnare och skillnader
-3. Lyft fram 2-3 perspektiv som är särskilt viktiga att fördjupa i nästa steg
+LPGD-MODELLENS ANDRA STEG: "BJUD IN PERSPEKTIV OCH ARGUMENT" (Inviting Perspectives and Arguments)
+Detta steg handlar om att aktivt lyssna, fråga och bekräfta olika perspektiv från personalgruppen. Forskning visar att det är viktigt att:
 
+1. LYSSNA AKTIVT och BEKRÄFTA (Listen and acknowledge):
+   - Identifiera alla unika perspektiv som framkommit
+   - Bekräfta varje persons bidrag utan att värdera
+   - Visa att alla perspektiv är legitima och värdefulla
+
+2. STÄLL FÖRDJUPANDE FRÅGOR:
+   - Hjälp gruppen artikulera sina tankar tydligare
+   - Utforska bakomliggande antaganden och erfarenheter
+   - Undvik att styra mot egna förutfattade meningar
+
+3. IDENTIFIERA MÖNSTER OCH SKILLNADER:
+   - Hitta gemensamma nämnare mellan olika perspektiv
+   - Synliggör konstruktiva spänningar och skillnader
+   - Kartlägg områden där gruppen behöver fördjupa diskussionen
+
+KONTEXT FRÅN TIDIGARE STEG:
 URSPRUNGLIGT PROBLEM: {problem_beskrivning}
-TRANSKRIBERING: {transcript}
 
-Ge en tydlig och strukturerad sammanfattning som underlag för fördjupad diskussion. Avsluta med rekommendation om vilka perspektiv som bör väljas för fördjupning. Använd INTE emojis i ditt svar.
+TRANSKRIBERING FRÅN SAMTAL:
+{transcript}
+
+UPPGIFT:
+Analysera transkriberingen enligt LPGD-principerna och skapa en strukturerad sammanfattning som innehåller:
+
+**1. Översikt av framkomna perspektiv**
+   - Lista alla unika perspektiv och synsätt som deltagarna delat
+   - Sammanfatta varje perspektiv kortfattat men rättvisande
+   - Bekräfta mångfalden i gruppens tankar
+
+**2. Analys av mönster och teman**
+   - Identifiera gemensamma nämnare och återkommande teman
+   - Synliggör viktiga skillnader i synsätt
+   - Visa på konstruktiva spänningar som kan driva utveckling
+
+**3. Fördjupningsområden**
+   - Identifiera 2-3 perspektiv/områden som är särskilt viktiga att fördjupa
+   - Förklara VARFÖR dessa är kritiska för att komma vidare
+   - Koppla tillbaka till ursprungsproblemet och elevernas bästa
+
+**4. Rekommendation för nästa steg**
+   - Ge ett tydligt förslag på vilka perspektiv som bör väljas för fördjupad diskussion
+   - Föreslå eventuella fördjupande frågor för nästa fas
+   - Förklara hur dessa val kan leda till konstruktiva åtgärder
+
+**5. Reflektion om gruppen processer**
+   - Hur väl lyssnar gruppen på varandra?
+   - Finns det perspektiv som inte fått tillräckligt utrymme?
+   - Vilka styrkor i gruppens sätt att diskutera kan rektorn bygga vidare på?
+
+Svara på svenska i tydligt strukturerat format med markdown. Använd INTE emojis. Basera ditt svar på forskningsbaserade LPGD-principer för att aktivt bjuda in och bekräfta perspektiv.
 """
 
 STEG3_PROMPT = """
-Du är en samtalscoach för rektorer. Här är en transkribering från en fördjupad diskussion om utvalda perspektiv.
+Du är en expert på att leda professionella samtal enligt LPGD-modellen (Leading Professional Group Discussions). Din expertis bygger på forskningsbaserade principer för hur rektorer effektivt kan leda samtal i svenska skolor.
 
-UPPGIFT: Analysera samtalet och dra slutsatser kring:
-- Vilka lösningar, insikter eller åtgärdsförslag har diskuterats?
-- Vilka hinder och möjligheter har identifierats?
-- Vilka slutsatser kan ligga till grund för en konkret handlingsplan?
+LPGD-MODELLENS TREDJE STEG: "FÖRDJUPA DISKUSSIONEN" (Advancing the Discussion)
+Detta steg är centralt för att röra sig från olika perspektiv till gemensamma insikter och konkreta lösningar. Forskning visar att rektorer måste aktivt:
 
-Följ LPGD-modellen: 1. Fördjupa och strukturera diskussionen, 2. Sammanfatta mönster och insikter, 3. Avsluta med konkreta slutsatser.
+1. SAMORDNA och KOMBINERA (Align and combine):
+   - Hitta gemensam grund mellan olika perspektiv
+   - Bygga broar mellan synsätt som kan verka motsägelsefulla
+   - Skapa syntes av olika idéer till nya lösningar
 
+2. FINJUSTERA och ANPASSA (Attune):
+   - Fördjupa förståelsen för komplexiteten i problemet
+   - Identifiera praktiska möjligheter och realistiska hinder
+   - Anpassa lösningar till den specifika kontexten
+
+3. RÖRA SIG MOT HANDLING:
+   - Transformera insikter till konkreta åtgärdsförslag
+   - Identifiera vad som behöver göras och i vilken ordning
+   - Skapa samsyn kring vägen framåt
+
+KONTEXT FRÅN TIDIGARE STEG:
 URSPRUNGLIGT PROBLEM: {problem_beskrivning}
-VALDA PERSPEKTIV FRÅN STEG 2: {selected_perspectives}
-FÖRDJUPAD DISKUSSION: {transcript}
 
-Ge en tydlig sammanfattning av slutsatser och möjliga åtgärder. Använd INTE emojis i ditt svar.
+VALDA PERSPEKTIV FRÅN STEG 2: {selected_perspectives}
+
+FÖRDJUPAD DISKUSSION (Transkribering):
+{transcript}
+
+UPPGIFT:
+Analysera den fördjupade diskussionen enligt LPGD-principerna och skapa en strukturerad analys som innehåller:
+
+**1. Syntes av perspektiv och insikter**
+   - Hur har gruppen rört sig från olika perspektiv mot gemensam förståelse?
+   - Vilka nya insikter har vuxit fram genom dialogen?
+   - Vilka sammankopplingar mellan perspektiv har gruppen gjort?
+
+**2. Identifierade lösningar och åtgärdsförslag**
+   - Vilka konkreta lösningar eller åtgärder har diskuterats?
+   - Hur väl är dessa förankrade i gruppens gemensamma förståelse?
+   - Vilka lösningar verkar ha starkast stöd?
+
+**3. Möjligheter och resurser**
+   - Vilka möjligheter har identifierats?
+   - Vilka resurser (tid, kunskap, material) finns tillgängliga?
+   - Vilka styrkor i gruppen/skolan kan man bygga på?
+
+**4. Hinder och utmaningar**
+   - Vilka praktiska hinder har identifierats?
+   - Vilka strukturella eller organisatoriska begränsningar finns?
+   - Hur har gruppen resonerat kring att hantera dessa hinder?
+
+**5. Slutsatser för handlingsplan**
+   - Vilka är de 3-5 viktigaste slutsatserna från diskussionen?
+   - Vilka konkreta åtgärder bör ingå i handlingsplanen?
+   - Vad behöver prioriteras först?
+   - Hur kan framsteg följas upp och utvärderas?
+
+**6. Gruppens beredskap**
+   - Hur redo verkar gruppen vara att gå från ord till handling?
+   - Finns det områden som behöver ytterligare fördjupning?
+   - Vilken nivå av samsyn har gruppen uppnått?
+
+Svara på svenska i tydligt strukturerat format med markdown. Använd INTE emojis. Basera ditt svar på forskningsbaserade LPGD-principer för att fördjupa diskussionen mot konkreta åtgärder.
 """
 
 STEG4_PROMPT = """
-Du är en samtalscoach för rektorer. Här är en sammanfattning/slutsats eller transkribering från ett samtal om åtgärder.
+Du är en expert på att leda professionella samtal enligt LPGD-modellen (Leading Professional Group Discussions). Din expertis bygger på forskningsbaserade principer för hur rektorer effektivt kan leda samtal i svenska skolor.
 
-UPPGIFT: Skriv en konkret handlingsplan enligt denna mall:
-- Syfte och mål
-- Viktiga åtgärder och ansvariga
-- Tidsplan och uppföljning
-- Stöd och resurser
+LPGD-MODELLENS FJÄRDE STEG: "AVSLUTA OCH SAMMANFATTA" (Wrapping Up)
+Detta steg är kritiskt för att transformera diskussioner till konkret handling. Forskning visar att effektiva avslut inkluderar:
 
-UNDERLAG: {conclusions}
+1. SAMMANFATTA INSIKTER OCH SLUTSATSER:
+   - Tydliggör vad gruppen kommit fram till
+   - Bekräfta gemensam förståelse och samsyn
+   - Koppla tillbaka till ursprungsproblemet och elevernas bästa
 
-Skriv handlingsplanen tydligt och strukturerat på svenska. Använd INTE emojis i ditt svar.
+2. KONKRET HANDLINGSPLAN:
+   - Specificera tydliga åtgärder med ansvariga personer
+   - Realistisk tidsplan med milstolpar
+   - Identifiera nödvändiga resurser och stöd
+
+3. UPPFÖLJNING OCH LÄRANDE:
+   - Definiera hur framsteg ska följas upp
+   - Planera för återkoppling och justering
+   - Skapa förutsättningar för organisatoriskt lärande
+
+KONTEXT FRÅN TIDIGARE STEG:
+URSPRUNGLIGT PROBLEM: {problem_beskrivning}
+
+SLUTSATSER OCH UNDERLAG:
+{conclusions}
+
+EVENTUELL KOMPLETTERANDE INFORMATION:
+{action_suggestions}
+
+UPPGIFT:
+Skapa en konkret och genomförbar handlingsplan baserad på gruppens diskussioner och slutsatser. Handlingsplanen ska följa LPGD-modellens principer och innehålla:
+
+**1. Sammanfattning av syfte och mål**
+   - Påminnelse om ursprungsproblemet
+   - Gruppens gemensamma mål för förändring
+   - Koppling till elevernas lärande och skolans utveckling
+   - Varför detta är viktigt att genomföra nu
+
+**2. Konkreta åtgärder**
+   För varje åtgärd, specificera:
+   - Vad som ska göras (konkret och mätbart)
+   - Vem som är ansvarig (namngivna personer eller roller)
+   - När det ska vara klart (realistiska deadlines)
+   - Eventuella beroenden mellan åtgärder
+
+**3. Resurser och stöd**
+   - Vilka resurser behövs (tid, budget, material, kompetens)?
+   - Vilket stöd behöver de ansvariga?
+   - Hur kan rektorn och skolledningen underlätta?
+   - Finns det extern kunskap eller stöd att ta in?
+
+**4. Tidsplan och milstolpar**
+   - Övergripande tidsram för genomförandet
+   - Viktiga milstolpar och checkpoints
+   - Kortare och längre perspektiv (quick wins + långsiktig förändring)
+
+**5. Uppföljning och utvärdering**
+   - Hur ska framsteg följas upp? (regelbundna möten, checklistor, etc.)
+   - Vilka indikatorer visar att vi rör oss åt rätt håll?
+   - När ska vi utvärdera och justera planen?
+   - Hur säkerställer vi lärande från processen?
+
+**6. Kommunikation och förankring**
+   - Hur kommuniceras planen till hela personalgruppen?
+   - Hur hålls alla engagerade och informerade?
+   - Hur dokumenteras framsteg och lärdomar?
+
+**7. Risker och beredskap**
+   - Vilka risker eller hinder kan uppstå?
+   - Hur hanterar vi om saker inte går enligt plan?
+   - Vad är plan B för kritiska åtgärder?
+
+Skriv handlingsplanen tydligt, konkret och strukturerat på svenska. Använd INTE emojis. Basera ditt svar på forskningsbaserade LPGD-principer för att avsluta och transformera samtal till handling.
 """
 
 MAX_CHUNK_SIZE = 2000  # sänkt till 2000 tecken per del
@@ -142,13 +330,13 @@ def analyze_long_text(prompt_template, **kwargs):
             return get_ai_response(sammanfattningsprompt)
 
 @st.cache_data(show_spinner=False, ttl=0)
-def get_ai_response(prompt, max_tokens=2000):
-    """Hämta AI-svar från OpenAI"""
+def get_ai_response(prompt, max_tokens=4000):
+    """Hämta AI-svar från OpenAI med ökat tokenlimit för bättre svar"""
     try:
         response = client.chat.completions.create(
             model="gpt-4",
             messages=[
-                {"role": "system", "content": "Du är en expert på pedagogisk ledning i svenska skolor. Använd aldrig emojis i dina svar - skriv endast ren text."},
+                {"role": "system", "content": "Du är en expert på att leda professionella gruppdiskussioner (LPGD-modellen) och pedagogisk ledning i svenska skolor. Du baserar dina råd på forskningsbaserade principer. Använd aldrig emojis i dina svar - skriv endast ren text."},
                 {"role": "user", "content": prompt}
             ],
             max_tokens=max_tokens,

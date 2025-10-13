@@ -24,6 +24,9 @@ load_css()
 # Initialisera session
 init_session()
 
+# Hämta current session först (innan sidebar)
+current_session = get_current_session()
+
 # Title och logga
 st.markdown('<div style="text-align: center; padding: 1rem 0;">', unsafe_allow_html=True)
 st.markdown('<div style="color: #262730; font-size: 1.8rem; font-weight: 600; margin-bottom: 0.5rem; text-align: center;">Pedagogiskt samtalsstöd</div>', unsafe_allow_html=True)
@@ -37,7 +40,7 @@ st.markdown('</div>', unsafe_allow_html=True)
 
 # Sidebar för session management
 with st.sidebar:
-    
+
     # API Key kontroll
     if not validate_api_key():
         st.error("⚠️ OpenAI API-nyckel saknas!")
@@ -48,11 +51,10 @@ with st.sidebar:
         3. Starta om applikationen
         """)
         st.stop()
-    
+
     st.divider()
-    
+
     # Aktuell samtal info
-    current_session = get_current_session()
     if current_session:
         st.subheader("Aktuellt Samtal")
         st.write(f"**{current_session['session_name']}**")
@@ -113,44 +115,59 @@ with st.sidebar:
 # Huvudinnehåll
 # Kontrollera om vi har en aktiv session
 if not current_session:
+    # Wrap all content in centered container
+    st.markdown('<div class="content-wrapper">', unsafe_allow_html=True)
+
     # Hero section
     st.markdown('<div class="hero-section">', unsafe_allow_html=True)
     st.markdown('<p class="hero-subtitle">Ett digitalt verktyg för att leda strukturerade pedagogiska samtal. Systemet analyserar automatiskt innehållet och ger dig värdefulla insikter.</p>', unsafe_allow_html=True)
-    st.markdown('<p style="text-align: center; color: #6c757d; margin-top: 2rem;">💡 Skapa eller välj ett samtal i sidopanelen för att komma igång.</p>', unsafe_allow_html=True)
+    st.markdown('<p style="text-align: center; color: #6c757d; margin-top: 1.5rem;">💡 Skapa eller välj ett samtal i sidopanelen för att komma igång.</p>', unsafe_allow_html=True)
     st.markdown('</div>', unsafe_allow_html=True)
 
     # Steginformation
-    st.markdown("### Så fungerar det")
-    col1, col2 = st.columns(2)
+    st.markdown('<div style="text-align: center; margin: 2rem 0 1.5rem 0;"><h3 style="font-size: 1.5rem; font-weight: 600; color: #262730;">Så fungerar det</h3></div>', unsafe_allow_html=True)
+
+    # Använd columns med spacing och offset för bättre centrering
+    col_spacer, col1, col2, col_spacer2 = st.columns([0.5, 1, 1, 0.5])
 
     with col1:
-        st.markdown("**Steg 1: Problembeskrivning**")
         st.markdown("""
-        - Definiera problemet eller frågan som ska diskuteras
-        - Få AI-stöd för hur du kan presentera det för gruppen
-        """)
-        st.markdown("")
-
-        st.markdown("**Steg 3: Fördjupad diskussion**")
-        st.markdown("""
-        - Fördjupa diskussionen kring utvalda perspektiv
-        - Identifiera slutsatser och konsensus
-        """)
+        <div style="margin-bottom: 2rem;">
+            <p style="font-weight: 600; margin-bottom: 0.5rem; font-size: 1.05rem;">Steg 1: Problembeskrivning</p>
+            <ul style="margin: 0; padding-left: 1.2rem;">
+                <li>Definiera problemet eller frågan som ska diskuteras</li>
+                <li>Få AI-stöd för hur du kan presentera det för gruppen</li>
+            </ul>
+        </div>
+        <div>
+            <p style="font-weight: 600; margin-bottom: 0.5rem; font-size: 1.05rem;">Steg 3: Fördjupad diskussion</p>
+            <ul style="margin: 0; padding-left: 1.2rem;">
+                <li>Fördjupa diskussionen kring utvalda perspektiv</li>
+                <li>Identifiera slutsatser och konsensus</li>
+            </ul>
+        </div>
+        """, unsafe_allow_html=True)
 
     with col2:
-        st.markdown("**Steg 2: Perspektivinventering**")
         st.markdown("""
-        - Spela in gruppsamtalet där olika perspektiv framkommer
-        - AI sammanfattar och kategoriserar de olika synvinklarna
-        """)
-        st.markdown("")
+        <div style="margin-bottom: 2rem;">
+            <p style="font-weight: 600; margin-bottom: 0.5rem; font-size: 1.05rem;">Steg 2: Perspektivinventering</p>
+            <ul style="margin: 0; padding-left: 1.2rem;">
+                <li>Spela in gruppsamtalet där olika perspektiv framkommer</li>
+                <li>AI sammanfattar och kategoriserar de olika synvinklarna</li>
+            </ul>
+        </div>
+        <div>
+            <p style="font-weight: 600; margin-bottom: 0.5rem; font-size: 1.05rem;">Steg 4: Handlingsplan</p>
+            <ul style="margin: 0; padding-left: 1.2rem;">
+                <li>Skapa en strukturerad handlingsplan baserat på diskussionen</li>
+                <li>Exportera färdig plan med ansvar, tidsramar och uppföljning</li>
+            </ul>
+        </div>
+        """, unsafe_allow_html=True)
 
-        st.markdown("**Steg 4: Handlingsplan**")
-        st.markdown("""
-        - Skapa en strukturerad handlingsplan baserat på diskussionen
-        - Exportera färdig plan med ansvar, tidsramar och uppföljning
-        """)
-
+    # Close content wrapper
+    st.markdown('</div>', unsafe_allow_html=True)
     st.stop()
 
 # Navigation för stegen
