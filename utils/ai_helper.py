@@ -1,14 +1,16 @@
-from openai import OpenAI
+from openai import OpenAI, AsyncOpenAI
 import streamlit as st
 import os
 from dotenv import load_dotenv
 import math
+import asyncio
 
 # Ladda miljövariabler
 load_dotenv()
 
-# Konfigurera OpenAI client
+# Konfigurera OpenAI clients
 client = OpenAI(api_key=os.getenv('OPENAI_API_KEY'))
+async_client = AsyncOpenAI(api_key=os.getenv('OPENAI_API_KEY'))
 
 # AI Prompts
 STEG1_PROMPT = """
@@ -273,7 +275,7 @@ MAX_CHUNK_SIZE = 2000  # sänkt till 2000 tecken per del
 def split_text(text, max_length=MAX_CHUNK_SIZE):
     return [text[i:i+max_length] for i in range(0, len(text), max_length)]
 
-# Ny hjälpfunktion för att analysera långa texter stegvis
+# Ny hjälpfunktion för att analysera långa texter stegvis med parallellisering
 @st.cache_data(show_spinner=False, ttl=0)
 def analyze_long_text(prompt_template, **kwargs):
     text = kwargs.get('transcript') or kwargs.get('conclusions')
@@ -284,24 +286,15 @@ def analyze_long_text(prompt_template, **kwargs):
         prompt = prompt_template.format(**kwargs)
         return get_ai_response(prompt)
     else:
-        st.info(f"Transkriberingen är lång ({len(text)} tecken). AI:n analyserar i {len(chunks)} steg – detta kan ta lite längre tid.")
-        delanalyser = []
-        for idx, chunk in enumerate(chunks):
-            st.info(f"Analyserar del {idx+1} av {len(chunks)}...")
-            local_kwargs = kwargs.copy()
-            local_kwargs['transcript'] = chunk
-            prompt = prompt_template.format(**local_kwargs)
-            try:
-                delanalys = get_ai_response(prompt)
-                if delanalys:
-                    delanalyser.append(delanalys)
-                else:
-                    st.warning(f"Delanalys {idx+1} misslyckades och hoppas över.")
-            except Exception as e:
-                st.warning(f"Fel vid AI-analys av del {idx+1}: {e}. Hoppas över denna del.")
+        st.info(f"Transkriberingen är lång ({len(text)} tecken). AI:n analyserar {len(chunks)} delar parallellt – detta går mycket snabbare!")
+
+        # Kör parallell analys av alla chunks
+        delanalyser = asyncio.run(analyze_chunks_parallel(chunks, prompt_template, kwargs))
+
         if not delanalyser:
             st.error("Ingen delanalys lyckades. Försök korta ner texten eller dela upp samtalet manuellt.")
             return None
+
         # Slå ihop delanalyserna, men om det blir för långt, dela även dessa
         sammanfattningsprompt = (
             "Du är en samtalscoach för rektorer. Här är delanalyser av ett långt samtal. Sammanfatta och strukturera huvuddragen, viktiga perspektiv och slutsatser så att det blir en helhetsbild enligt LPGD-modellen.\n\nDELANALYSER:\n" + "\n\n".join(delanalyser)
@@ -346,6 +339,46 @@ def get_ai_response(prompt, max_tokens=4000):
     except Exception as e:
         st.error(f"Fel vid AI-anrop: {str(e)}")
         return None
+
+async def get_ai_response_async(prompt, max_tokens=4000):
+    """Async version av get_ai_response för parallell bearbetning"""
+    try:
+        response = await async_client.chat.completions.create(
+            model="gpt-4",
+            messages=[
+                {"role": "system", "content": "Du är en expert på att leda professionella gruppdiskussioner (LPGD-modellen) och pedagogisk ledning i svenska skolor. Du baserar dina råd på forskningsbaserade principer. Använd aldrig emojis i dina svar - skriv endast ren text."},
+                {"role": "user", "content": prompt}
+            ],
+            max_tokens=max_tokens,
+            temperature=0.7
+        )
+        return response.choices[0].message.content
+    except Exception as e:
+        return None
+
+async def analyze_chunks_parallel(chunks, prompt_template, kwargs):
+    """Analysera flera chunks parallellt med asyncio.gather()"""
+    tasks = []
+    for chunk in chunks:
+        local_kwargs = kwargs.copy()
+        local_kwargs['transcript'] = chunk
+        prompt = prompt_template.format(**local_kwargs)
+        tasks.append(get_ai_response_async(prompt))
+
+    # Kör alla AI-anrop parallellt
+    results = await asyncio.gather(*tasks, return_exceptions=True)
+
+    # Filtrera bort None och exceptions
+    delanalyser = []
+    for idx, result in enumerate(results):
+        if isinstance(result, Exception):
+            st.warning(f"Delanalys {idx+1} misslyckades: {str(result)}")
+        elif result:
+            delanalyser.append(result)
+        else:
+            st.warning(f"Delanalys {idx+1} returnerade inget resultat.")
+
+    return delanalyser
 
 def get_ai_suggestion_steg1(problem_beskrivning, personal_grupp, kontext=""):
     """Hämta AI-förslag för Steg 1"""
