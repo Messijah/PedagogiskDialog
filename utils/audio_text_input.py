@@ -1,6 +1,6 @@
 import streamlit as st
 from utils.audio_handler import (
-    transcribe_audio_openai,
+    transcribe_audio_file,
     validate_audio_file,
     record_and_transcribe_audio,
     save_uploaded_audio,
@@ -40,7 +40,7 @@ def audio_text_input(step_number, session_id, key_prefix=""):
 
             if st.button("🔊 Transkribera uppladdad fil", key=f"{key_prefix}_trans_up_{step_number}"):
                 with st.spinner("Transkriberar..."):
-                    transcript = transcribe_audio_openai(audio_path)
+                    transcript = transcribe_audio_file(audio_path)
                 if transcript:
                     st.text_area(
                         "Transkribering:",

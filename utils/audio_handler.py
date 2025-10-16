@@ -2,6 +2,10 @@ import streamlit as st
 import os
 from datetime import datetime
 import asyncio
+from dotenv import load_dotenv
+
+# Ladda environment variabler
+load_dotenv()
 
 def save_uploaded_audio(uploaded_file, session_id, step_number):
     """
@@ -60,7 +64,7 @@ def transcribe_uploaded_file(uploaded_file, session_id, step_number):
                 transcription = transcribe_large_audio_file(audio_path)
             else:
                 # Transkribera normalt endast för mycket små filer
-                transcription = transcribe_audio_openai(audio_path)
+                transcription = transcribe_audio_file(audio_path)
             
             return transcription, audio_path
         else:
@@ -69,6 +73,13 @@ def transcribe_uploaded_file(uploaded_file, session_id, step_number):
     except Exception as e:
         st.error(f"Fel vid hantering av uppladdad fil: {e}")
         return None, None
+
+def get_transcription_backend():
+    """
+    Hämta vald transkriberings-backend från environment
+    Returns: 'kb-whisper' eller 'openai' (default)
+    """
+    return os.getenv('TRANSCRIPTION_BACKEND', 'openai').lower()
 
 def transcribe_audio_openai(audio_file_path):
     """
@@ -98,6 +109,38 @@ def transcribe_audio_openai(audio_file_path):
     except Exception as e:
         st.error(f"Fel vid transkribering: {e}")
         return None
+
+def transcribe_audio_file(audio_file_path):
+    """
+    Transkribera en ljudfil med vald backend (KB-Whisper eller OpenAI)
+    Automatiskt val baserat på TRANSCRIPTION_BACKEND environment variabel
+
+    Args:
+        audio_file_path: Sökväg till ljudfil
+
+    Returns:
+        Transkribering som sträng eller None vid fel
+    """
+    backend = get_transcription_backend()
+
+    if backend == 'kb-whisper':
+        st.info("🇸🇪 Använder KB-Whisper (lokal svensk modell)")
+        try:
+            from utils.kb_whisper import transcribe_with_kb_whisper, is_kb_whisper_available
+
+            if not is_kb_whisper_available():
+                st.warning("⚠️ KB-Whisper dependencies saknas. Installera med: pip install transformers torch accelerate librosa soundfile")
+                st.info("🔄 Faller tillbaka till OpenAI Whisper...")
+                return transcribe_audio_openai(audio_file_path)
+
+            return transcribe_with_kb_whisper(audio_file_path)
+        except Exception as e:
+            st.error(f"❌ Fel vid KB-Whisper transkribering: {e}")
+            st.info("🔄 Faller tillbaka till OpenAI Whisper...")
+            return transcribe_audio_openai(audio_file_path)
+    else:
+        st.info("🌐 Använder OpenAI Whisper API")
+        return transcribe_audio_openai(audio_file_path)
 
 def split_audio_file(audio_file_path, segment_duration_minutes=10):
     """
@@ -440,8 +483,8 @@ def record_and_transcribe_audio(session_id, step_number, key_prefix=""):
                     transcription = transcribe_large_audio_file(audio_file_path)
                 else:
                     # Transkribera normalt endast för mycket små filer
-                    with st.spinner("Transkriberar ljud med OpenAI Whisper..."):
-                        transcription = transcribe_audio_openai(audio_file_path)
+                    with st.spinner("Transkriberar ljud..."):
+                        transcription = transcribe_audio_file(audio_file_path)
                 
                 if transcription:
                     st.success("✅ Transkribering klar!")
@@ -549,8 +592,8 @@ def record_and_transcribe_audio(session_id, step_number, key_prefix=""):
                             st.info("🔄 Använder segmenterad transkribering för optimal säkerhet och resultat...")
                             transcription = transcribe_large_audio_file(audio_file_path)
                         else:
-                            with st.spinner("Transkriberar ljud med OpenAI Whisper..."):
-                                transcription = transcribe_audio_openai(audio_file_path)
+                            with st.spinner("Transkriberar ljud..."):
+                                transcription = transcribe_audio_file(audio_file_path)
                         
                         if transcription:
                             st.success("✅ Transkribering klar!")
