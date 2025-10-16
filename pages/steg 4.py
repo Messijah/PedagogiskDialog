@@ -14,6 +14,16 @@ from reportlab.lib.enums import TA_LEFT
 from reportlab.lib.units import mm
 import json
 
+# Helper function för att dekoda text med unicode-escapes
+def decode_text(text):
+    """Dekoda text som kan innehålla unicode-escapes"""
+    try:
+        if isinstance(text, str) and ('\\u' in text or '\\n' in text):
+            text = bytes(text, "utf-8").decode("unicode_escape")
+    except Exception:
+        pass
+    return text.replace('\n', '<br/>') if isinstance(text, str) else text
+
 # Konfigurera sida
 st.set_page_config(
     page_title="Steg 4 - Handlingsplan",
@@ -133,15 +143,6 @@ HANDLINGSPLAN:
             )
 
             # --- Snygg PDF-export ---
-            def decode_text(text):
-                # Om texten innehåller unicode-escapes, dekoda dem
-                try:
-                    if isinstance(text, str) and ('\\u' in text or '\\n' in text):
-                        text = bytes(text, "utf-8").decode("unicode_escape")
-                except Exception:
-                    pass
-                return text.replace('\n', '<br/>') if isinstance(text, str) else text
-
             def create_pdf():
                 buffer = tempfile.NamedTemporaryFile(delete=False, suffix=".pdf")
                 doc = SimpleDocTemplate(buffer.name, pagesize=A4, rightMargin=30, leftMargin=30, topMargin=30, bottomMargin=30)
