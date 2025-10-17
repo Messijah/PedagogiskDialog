@@ -97,7 +97,9 @@ Du behöver en OpenAI API-nyckel för att använda applikationen. Skaffa en på 
 
 ### Ljudinspelning
 Applikationen stöder:
-- Filuppladdning (WAV, MP3, M4A, MP4)
+- Filuppladdning (WAV, MP3, M4A) upp till 450 MB
+- Automatisk segmentering för filer över 5 MB
+- Parallell transkribering för snabb bearbetning (upp till 2 timmar ljud)
 - Direktinspelning i webbläsaren (kräver `streamlit-audio-recorder`)
 
 ### Databas

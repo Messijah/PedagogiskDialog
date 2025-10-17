@@ -25,8 +25,8 @@ def audio_text_input(step_number, session_id, key_prefix=""):
 
     # 1) Uppladdning av befintlig ljudfil
     uploaded_file = st.file_uploader(
-        label="1. Ladda upp ljudfil (wav/mp3)",
-        type=["wav", "mp3"],
+        label="1. Ladda upp ljudfil (wav/mp3/m4a)",
+        type=["wav", "mp3", "m4a"],
         key=f"{key_prefix}_uploader_{step_number}"
     )
     if uploaded_file:

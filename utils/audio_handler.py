@@ -9,19 +9,27 @@ load_dotenv()
 
 def save_uploaded_audio(uploaded_file, session_id, step_number):
     """
-    Spara uppladdad ljudfil (wav/mp3) på disk under data/audio.
+    Spara uppladdad ljudfil (wav/mp3/m4a) på disk under data/audio.
+    Använder streaming för stora filer för att undvika minnesöverbelastning.
     """
     if not os.path.exists('data/audio'):
         os.makedirs('data/audio')
-    
+
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    file_extension = uploaded_file.name.split('.')[-1]
+    file_extension = uploaded_file.name.split('.')[-1].lower()
     filename = f"session_{session_id}_steg_{step_number}_{timestamp}.{file_extension}"
     filepath = os.path.join('data/audio', filename)
-    
+
+    # Streama stora filer istället för att ladda allt i minnet
+    chunk_size = 1024 * 1024  # 1 MB chunks
     with open(filepath, 'wb') as f:
-        f.write(uploaded_file.getbuffer())
-    
+        uploaded_file.seek(0)
+        while True:
+            chunk = uploaded_file.read(chunk_size)
+            if not chunk:
+                break
+            f.write(chunk)
+
     return filepath
 
 def save_recorded_audio(audio_bytes: bytes, session_id, step_number):
@@ -145,12 +153,15 @@ def transcribe_audio_file(audio_file_path):
 def split_audio_file(audio_file_path, segment_duration_minutes=10):
     """
     Dela upp en ljudfil i segment för transkribering med ffmpeg.
+    Stöder wav, mp3, m4a och andra format som ffmpeg kan hantera.
     Returnerar lista med sökvägar till segment-filer.
     """
     try:
         import subprocess
         import math
         import json
+
+        st.info(f"🔍 Analyserar ljudfil: {os.path.basename(audio_file_path)}")
 
         # Använd ffprobe för att få ljudfilens längd
         probe_cmd = [
@@ -162,14 +173,25 @@ def split_audio_file(audio_file_path, segment_duration_minutes=10):
         ]
 
         result = subprocess.run(probe_cmd, capture_output=True, text=True)
+
+        if result.returncode != 0:
+            st.error(f"Kunde inte analysera ljudfil: {result.stderr}")
+            return []
+
         probe_data = json.loads(result.stdout)
         total_duration_seconds = float(probe_data['format']['duration'])
+
+        # Visa info om filen
+        duration_minutes = int(total_duration_seconds / 60)
+        st.info(f"⏱️ Ljudfilens längd: {duration_minutes} minuter ({total_duration_seconds:.0f} sekunder)")
 
         # Beräkna segment-längd i sekunder
         segment_duration_seconds = segment_duration_minutes * 60
 
         # Beräkna antal segment
         num_segments = math.ceil(total_duration_seconds / segment_duration_seconds)
+
+        st.info(f"✂️ Delar upp i {num_segments} segment à {segment_duration_minutes} minuter")
 
         segment_paths = []
         base_path = audio_file_path.rsplit('.', 1)[0]
@@ -178,7 +200,8 @@ def split_audio_file(audio_file_path, segment_duration_minutes=10):
             start_time = i * segment_duration_seconds
             segment_path = f"{base_path}_segment_{i+1}.wav"
 
-            # Använd ffmpeg för att extrahera segment
+            # Använd ffmpeg för att extrahera segment och konvertera till WAV
+            # Detta säkerställer kompatibilitet med OpenAI Whisper oavsett källformat
             ffmpeg_cmd = [
                 'ffmpeg',
                 '-i', audio_file_path,
@@ -188,16 +211,27 @@ def split_audio_file(audio_file_path, segment_duration_minutes=10):
                 '-ar', '16000',
                 '-ac', '1',
                 '-y',  # Overwrite output file if it exists
+                '-loglevel', 'error',  # Minska output
                 segment_path
             ]
 
-            subprocess.run(ffmpeg_cmd, capture_output=True, check=True)
+            result = subprocess.run(ffmpeg_cmd, capture_output=True, text=True)
+
+            if result.returncode != 0:
+                st.warning(f"⚠️ Kunde inte skapa segment {i+1}: {result.stderr}")
+                continue
+
             segment_paths.append(segment_path)
+            st.success(f"✅ Segment {i+1}/{num_segments} skapat")
 
         return segment_paths
 
+    except FileNotFoundError:
+        st.error("❌ ffmpeg är inte installerat. Installera ffmpeg för att hantera stora ljudfiler.")
+        st.info("På Mac: brew install ffmpeg\nPå Linux: apt-get install ffmpeg")
+        return []
     except Exception as e:
-        st.error(f"Fel vid segmentering av ljudfil: {e}")
+        st.error(f"❌ Fel vid segmentering av ljudfil: {e}")
         return []
 
 async def transcribe_audio_openai_async(audio_file_path, segment_number=None):
@@ -327,11 +361,12 @@ def format_duration(seconds: int):
     else:
         return f"{seconds}s"
 
-def validate_audio_file(uploaded_file, max_duration_seconds=36):
+def validate_audio_file(uploaded_file, max_duration_seconds=7200):
     """
     Kontrollera att uppladdad fil är under maxstorlek (MB).
+    Stöder längre samtal (upp till 2 timmar).
     """
-    max_size_mb = 100  # Ökat från 5 MB till 100 MB för längre samtal
+    max_size_mb = 450  # Ökat till 450 MB för att stödja längre högkvalitativa inspelningar
     if uploaded_file.size > max_size_mb * 1024 * 1024:
         return False, f"Filen är för stor. Max: {max_size_mb} MB."
     return True, "OK"

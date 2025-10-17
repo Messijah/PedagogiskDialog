@@ -7,9 +7,10 @@ textColor = "#262730"
 
 [server]
 headless = true
-maxUploadSize = 200
+maxUploadSize = 500
 enableCORS = false
 enableXsrfProtection = false
+maxMessageSize = 500
 
 [global]
 maxCachedMessageAge = 0
