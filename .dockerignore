@@ -9,7 +9,6 @@ env/
 venv/
 .git
 .gitignore
-*.md
 .DS_Store
 *.log
 session_data.db
@@ -17,3 +16,26 @@ recorded_audio/
 test_*.py
 *.ipynb
 .streamlit/secrets.toml
+
+# Dokumentation (behövs inte i container)
+*.md
+!README.md
+
+# Data som ska vara persistent (inte i image)
+data/
+data/audio/
+data/sessions.db
+
+# Cache och temporära filer
+.cache/
+cache/
+*.tmp
+*.swp
+
+# PDFs och stora filer
+*.pdf
+
+# IDE-filer
+.vscode/
+.idea/
+*.code-workspace
